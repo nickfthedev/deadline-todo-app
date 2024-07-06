@@ -1,9 +1,18 @@
-import Link from "next/link";
-
-import { LatestPost } from "~/app/_components/post";
 import { getServerAuthSession } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
-import styles from "./index.module.css";
+import {
+  Box,
+  Flex,
+  Heading,
+  Text,
+  Separator,
+  TextField,
+  Button,
+  Dialog,
+} from "@radix-ui/themes";
+import { TimerCard } from "./_components/timer";
+import Link from "next/link";
+import { CreateTimerDialog } from "./_components/createTimerDialog";
 
 export default async function Home() {
   const hello = await api.post.hello({ text: "from tRPC" });
@@ -13,56 +22,56 @@ export default async function Home() {
 
   return (
     <HydrateClient>
-      <main className={styles.main}>
-        <div className={styles.container}>
-          <h1 className={styles.title}>
-            Create <span className={styles.pinkSpan}>T3</span> App
-          </h1>
-          <div className={styles.cardRow}>
-            <Link
-              className={styles.card}
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className={styles.cardTitle}>First Steps →</h3>
-              <div className={styles.cardText}>
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className={styles.card}
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className={styles.cardTitle}>Documentation →</h3>
-              <div className={styles.cardText}>
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
-          <div className={styles.showcaseContainer}>
-            <p className={styles.showcaseText}>
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
-
-            <div className={styles.authContainer}>
-              <p className={styles.showcaseText}>
-                {session && <span>Logged in as {session.user?.name}</span>}
-              </p>
+      <Flex direction="column" style={{ minHeight: "100vh" }}>
+        <Box py="4" px="6" style={{ backgroundColor: "var(--gray-3)" }}>
+          <Flex justify="between" align="center">
+            <Heading size="5">Header</Heading>
+            <div>
+              {session && <span>Logged in as {session.user?.name}</span>}
               <Link
                 href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                className={styles.loginButton}
+                style={{ marginLeft: "1rem" }}
               >
                 {session ? "Sign out" : "Sign in"}
               </Link>
             </div>
-          </div>
-
-          {session?.user && <LatestPost />}
-        </div>
-      </main>
+          </Flex>
+        </Box>
+        <Separator size="4" />
+        <Box py="6" px="6" style={{ flex: 1 }}>
+          <Heading size="4">Main Content</Heading>
+          <Text as="p">This is where your main content goes.</Text>
+          <Flex gap={"3"} justify={"center"} wrap={"wrap"}>
+            <TimerCard
+              title="Timer 1"
+              description="Description 1"
+              time={new Date(new Date().setDate(new Date().getDate() + 1))}
+            />
+            <TimerCard
+              title="Timer 2"
+              description="Description 2"
+              time={new Date(new Date().setDate(new Date().getDate() + 2))}
+            />
+            <TimerCard
+              title="Timer 3"
+              description="Description 3"
+              time={new Date(new Date().setDate(new Date().getDate() + 3))}
+            />
+            <TimerCard
+              title="Timer 4"
+              description="Description 4"
+              time={new Date(new Date().getTime() - 1 * 60 * 60 * 1000)}
+            />
+          </Flex>
+          <Flex justify={"center"} mt={"4"}>
+            <CreateTimerDialog />
+          </Flex>
+        </Box>
+        <Separator size="4" />
+        <Box py="4" px="6" style={{ backgroundColor: "var(--gray-3)" }}>
+          <Text as="p">Footer © 2024</Text>
+        </Box>
+      </Flex>
     </HydrateClient>
   );
 }
