@@ -11,79 +11,65 @@ import {
 import { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
 
-export function CreateTimerDialog() {
+interface Timer {
+  id: string;
+  title: string;
+  description: string;
+  date: Date;
+}
+
+export function EditTimerDialog({
+  timer,
+  isOpen,
+  onClose,
+}: {
+  timer: Timer;
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   const utils = api.useUtils();
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [title, setTitle] = useState(timer.title);
+  const [description, setDescription] = useState(timer.description);
+  const [date, setDate] = useState(timer.date.toISOString().split("T")[0]);
   const [time, setTime] = useState(
-    new Date().toLocaleTimeString("en-GB", {
+    timer.date.toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
     })
   );
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const createTimerMutation = api.timer.createTimer.useMutation({
+  const editTimerMutation = api.timer.editTimer.useMutation({
     onSuccess: () => {
       utils.timer.getAllTimersByUserID.invalidate();
-      setTitle("");
-      setDescription("");
-      setDate(new Date().toISOString().split("T")[0]);
-      setTime(
-        new Date().toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      );
     },
   });
 
   const handleSubmit = () => {
-    createTimerMutation.mutate({
+    editTimerMutation.mutate({
+      id: timer.id,
       title,
       description,
       date: new Date(date + "T" + time),
     });
   };
-
-  useEffect(() => {
-    if (createTimerMutation.data) {
-      setSuccessMessage("Timer created successfully");
-    }
-    if (createTimerMutation.error) {
-      setErrorMessage("There was an error creating the timer");
-    }
-  }, [createTimerMutation.data, createTimerMutation.error]);
-
   return (
-    <Dialog.Root>
-      <Dialog.Trigger>
-        <Button variant="soft">Create Timer</Button>
-      </Dialog.Trigger>
-
+    <Dialog.Root open={isOpen} onOpenChange={onClose}>
       <Dialog.Content maxWidth="450px">
-        <Dialog.Title>Create Timer</Dialog.Title>
+        <Dialog.Title>Edit Timer</Dialog.Title>
         <Flex direction="column" gap="3">
-          {errorMessage && (
+          {editTimerMutation.error && (
             <Callout.Root color="red">
-              <Callout.Text>{errorMessage}</Callout.Text>
+              <Callout.Text>There was an error editing the timer</Callout.Text>
             </Callout.Root>
           )}
-          {successMessage && (
+          {editTimerMutation.data && (
             <Callout.Root color="green">
-              <Callout.Text>{successMessage}</Callout.Text>
-            </Callout.Root>
-          )}
-          {createTimerMutation.data && (
-            <Callout.Root color="green">
-              <Callout.Text>Timer created successfully</Callout.Text>
+              <Callout.Text>Timer edited successfully</Callout.Text>
             </Callout.Root>
           )}
           <Dialog.Description size="2" mb="4">
-            Enter the details for your new timer.
+            Edit the details for your timer.
           </Dialog.Description>
         </Flex>
 
@@ -97,9 +83,9 @@ export function CreateTimerDialog() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-            {createTimerMutation.error?.data?.zodError?.fieldErrors.title && (
+            {editTimerMutation.error?.data?.zodError?.fieldErrors.title && (
               <Text color="red">
-                {createTimerMutation.error.data.zodError.fieldErrors.title}
+                {editTimerMutation.error.data.zodError.fieldErrors.title}
               </Text>
             )}
           </label>
@@ -122,9 +108,9 @@ export function CreateTimerDialog() {
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
-            {createTimerMutation.error?.data?.zodError?.fieldErrors.date && (
+            {editTimerMutation.error?.data?.zodError?.fieldErrors.date && (
               <Text color="red">
-                {createTimerMutation.error.data.zodError.fieldErrors.date}
+                {editTimerMutation.error.data.zodError.fieldErrors.date}
               </Text>
             )}
           </label>
@@ -137,9 +123,9 @@ export function CreateTimerDialog() {
               value={time}
               onChange={(e) => setTime(e.target.value)}
             />
-            {createTimerMutation.error?.data?.zodError?.fieldErrors.time && (
+            {editTimerMutation.error?.data?.zodError?.fieldErrors.time && (
               <Text color="red">
-                {createTimerMutation.error.data.zodError.fieldErrors.time}
+                {editTimerMutation.error.data.zodError.fieldErrors.time}
               </Text>
             )}
           </label>
@@ -152,11 +138,8 @@ export function CreateTimerDialog() {
             </Button>
           </Dialog.Close>
 
-          <Button
-            onClick={handleSubmit}
-            disabled={createTimerMutation.isPending}
-          >
-            {createTimerMutation.isPending ? "Creating..." : "Save"}
+          <Button onClick={handleSubmit} disabled={editTimerMutation.isPending}>
+            {editTimerMutation.isPending ? "Editing..." : "Save"}
           </Button>
         </Flex>
       </Dialog.Content>

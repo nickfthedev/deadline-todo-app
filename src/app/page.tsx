@@ -9,6 +9,7 @@ import {
   TextField,
   Button,
   Dialog,
+  DropdownMenu,
 } from "@radix-ui/themes";
 import { TimerCard } from "./_components/TimerCard";
 import Link from "next/link";
@@ -25,14 +26,30 @@ export default async function Home() {
           <Flex justify="between" align="center">
             <Heading size="5">Header</Heading>
             <Flex direction="row" gap={"3"} align={"center"}>
-              {session && <span>Logged in as {session.user?.name}</span>}
               {session && <CreateTimerDialog />}
-              <Link
-                href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                style={{ marginLeft: "1rem" }}
-              >
-                {session ? "Sign out" : "Sign in"}
-              </Link>
+              {!session && (
+                <Link href={"/api/auth/signout"}>
+                  {session ? "Sign out" : "Sign in"}
+                </Link>
+              )}
+              {session && (
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger>
+                    <Button variant="soft">
+                      Options
+                      <DropdownMenu.TriggerIcon />
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content>
+                    <DropdownMenu.Item>Welcome</DropdownMenu.Item>
+                    <DropdownMenu.Item>{session?.user?.name}</DropdownMenu.Item>
+                    <DropdownMenu.Separator />
+                    <DropdownMenu.Item>
+                      <Link href={"/api/auth/signout"}>Sign out</Link>
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
+              )}
             </Flex>
           </Flex>
         </Box>
