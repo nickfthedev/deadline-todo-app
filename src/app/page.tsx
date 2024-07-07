@@ -10,15 +10,13 @@ import {
   Button,
   Dialog,
 } from "@radix-ui/themes";
-import { TimerCard } from "./_components/timer";
+import { TimerCard } from "./_components/TimerCard";
 import Link from "next/link";
 import { CreateTimerDialog } from "./_components/createTimerDialog";
+import { TimerList } from "./_components/TimerList";
 
 export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
   const session = await getServerAuthSession();
-
-  void api.post.getLatest.prefetch();
 
   return (
     <HydrateClient>
@@ -26,42 +24,22 @@ export default async function Home() {
         <Box py="4" px="6" style={{ backgroundColor: "var(--gray-3)" }}>
           <Flex justify="between" align="center">
             <Heading size="5">Header</Heading>
-            <div>
+            <Flex direction="row" gap={"3"} align={"center"}>
               {session && <span>Logged in as {session.user?.name}</span>}
+              {session && <CreateTimerDialog />}
               <Link
                 href={session ? "/api/auth/signout" : "/api/auth/signin"}
                 style={{ marginLeft: "1rem" }}
               >
                 {session ? "Sign out" : "Sign in"}
               </Link>
-            </div>
+            </Flex>
           </Flex>
         </Box>
         <Separator size="4" />
         <Box py="6" px="6" style={{ flex: 1 }}>
-          <Heading size="4">Main Content</Heading>
-          <Text as="p">This is where your main content goes.</Text>
           <Flex gap={"3"} justify={"center"} wrap={"wrap"}>
-            <TimerCard
-              title="Timer 1"
-              description="Description 1"
-              time={new Date(new Date().setDate(new Date().getDate() + 1))}
-            />
-            <TimerCard
-              title="Timer 2"
-              description="Description 2"
-              time={new Date(new Date().setDate(new Date().getDate() + 2))}
-            />
-            <TimerCard
-              title="Timer 3"
-              description="Description 3"
-              time={new Date(new Date().setDate(new Date().getDate() + 3))}
-            />
-            <TimerCard
-              title="Timer 4"
-              description="Description 4"
-              time={new Date(new Date().getTime() - 1 * 60 * 60 * 1000)}
-            />
+            <TimerList />
           </Flex>
           <Flex justify={"center"} mt={"4"}>
             <CreateTimerDialog />

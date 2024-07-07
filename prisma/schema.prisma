@@ -77,9 +77,12 @@ model Timer {
     id          String   @id @default(cuid())
     title       String
     description String
-    time        DateTime
+    date        DateTime
+    done        Boolean  @default(false)
+
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
+    
     userId      String
     user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
