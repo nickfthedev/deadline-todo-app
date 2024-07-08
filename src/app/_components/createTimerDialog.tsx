@@ -28,6 +28,7 @@ export function CreateTimerDialog() {
 
   const createTimerMutation = api.timer.createTimer.useMutation({
     onSuccess: () => {
+      setSuccessMessage("Timer created successfully");
       utils.timer.getAllTimersByUserID.invalidate();
       setTitle("");
       setDescription("");
@@ -39,6 +40,9 @@ export function CreateTimerDialog() {
         })
       );
     },
+    onError: () => {
+      setErrorMessage("There was an error creating the timer");
+    },
   });
 
   const handleSubmit = () => {
@@ -49,17 +53,15 @@ export function CreateTimerDialog() {
     });
   };
 
-  useEffect(() => {
-    if (createTimerMutation.data) {
-      setSuccessMessage("Timer created successfully");
-    }
-    if (createTimerMutation.error) {
-      setErrorMessage("There was an error creating the timer");
-    }
-  }, [createTimerMutation.data, createTimerMutation.error]);
-
   return (
-    <Dialog.Root>
+    <Dialog.Root
+      onOpenChange={(open) => {
+        if (!open) {
+          setSuccessMessage(null);
+          setErrorMessage(null);
+        }
+      }}
+    >
       <Dialog.Trigger>
         <Button variant="soft">Create Timer</Button>
       </Dialog.Trigger>
@@ -77,11 +79,7 @@ export function CreateTimerDialog() {
               <Callout.Text>{successMessage}</Callout.Text>
             </Callout.Root>
           )}
-          {createTimerMutation.data && (
-            <Callout.Root color="green">
-              <Callout.Text>Timer created successfully</Callout.Text>
-            </Callout.Root>
-          )}
+
           <Dialog.Description size="2" mb="4">
             Enter the details for your new timer.
           </Dialog.Description>

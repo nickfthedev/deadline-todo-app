@@ -39,9 +39,16 @@ export function EditTimerDialog({
     })
   );
 
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const editTimerMutation = api.timer.editTimer.useMutation({
     onSuccess: () => {
       utils.timer.getAllTimersByUserID.invalidate();
+      setSuccessMessage("Timer edited successfully");
+    },
+    onError: () => {
+      setErrorMessage("There was an error editing the timer");
     },
   });
 
@@ -54,18 +61,27 @@ export function EditTimerDialog({
     });
   };
   return (
-    <Dialog.Root open={isOpen} onOpenChange={onClose}>
+    <Dialog.Root
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          setSuccessMessage(null);
+          setErrorMessage(null);
+        }
+        onClose();
+      }}
+    >
       <Dialog.Content maxWidth="450px">
         <Dialog.Title>Edit Timer</Dialog.Title>
         <Flex direction="column" gap="3">
-          {editTimerMutation.error && (
+          {errorMessage && (
             <Callout.Root color="red">
-              <Callout.Text>There was an error editing the timer</Callout.Text>
+              <Callout.Text>{errorMessage}</Callout.Text>
             </Callout.Root>
           )}
-          {editTimerMutation.data && (
+          {successMessage && (
             <Callout.Root color="green">
-              <Callout.Text>Timer edited successfully</Callout.Text>
+              <Callout.Text>{successMessage}</Callout.Text>
             </Callout.Root>
           )}
           <Dialog.Description size="2" mb="4">
