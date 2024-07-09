@@ -6,13 +6,15 @@ import { useEffect, useState } from "react";
 
 export function Sidebar() {
   const [isVisible, setIsVisible] = useState(false);
-  const [isPinned, setIsPinned] = useState(true);
+  const [isPinned, setIsPinned] = useState(false);
 
   const handleResize = () => {
     if (window.innerWidth >= 1024) {
       setIsVisible(true);
+      setIsPinned(true);
     } else {
       setIsVisible(false);
+      setIsPinned(false);
     }
   };
 
@@ -24,6 +26,19 @@ export function Sidebar() {
     };
   }, []);
 
+  const handleMouseEnter = () => {
+    if (!isPinned && window.innerWidth >= 1024) {
+      setIsVisible(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    // Not pinned and screen is large, prevent autoclose on mobile we dont want that
+    if (!isPinned && window.innerWidth >= 1024) {
+      setIsVisible(false);
+    }
+  };
+
   return (
     <Flex direction="column">
       <Button
@@ -32,20 +47,41 @@ export function Sidebar() {
       >
         Show Menu
       </Button>
-      <Box
-        className={`w-[200px] h-full bg-gray-950 dark:bg-gray-200 ${
-          isVisible ? "block" : "hidden"
-        }`}
-        style={{ backgroundColor: "var(--gray-2)" }}
-      >
-        <Flex justify="end">
-          <Button onClick={() => setIsVisible(false)}>Hide Menu</Button>
-        </Flex>
-        <Flex direction="column">
-          <Link href="/">Home</Link>
-          <Link href="/about">About</Link>
-          <Link href="/contact">Contact</Link>
-        </Flex>
+      <Box className="flex-1 bg-red-400" onMouseEnter={handleMouseEnter}>
+        <Box className="w-[100px] h-1"></Box>
+        <Box
+          onMouseLeave={handleMouseLeave}
+          className={`w-[200px] h-screen bg-base-200 z-50 ${
+            isVisible
+              ? isPinned
+                ? "block"
+                : "absolute top-30 left-0"
+              : "hidden"
+          }`}
+        >
+          <Flex justify="end">
+            {window.innerWidth >= 1024 && (
+              <Button
+                onClick={() => {
+                  if (isPinned) {
+                    setIsVisible(false);
+                  }
+                  setIsPinned(!isPinned);
+                }}
+              >
+                {isPinned ? "Unpin" : "Pin"}
+              </Button>
+            )}
+            {window.innerWidth < 1024 && (
+              <Button onClick={() => setIsVisible(false)}>Hide Menu</Button>
+            )}
+          </Flex>
+          <Flex direction="column">
+            <Link href="/">Home</Link>
+            <Link href="/about">About</Link>
+            <Link href="/contact">Contact</Link>
+          </Flex>
+        </Box>
       </Box>
     </Flex>
   );

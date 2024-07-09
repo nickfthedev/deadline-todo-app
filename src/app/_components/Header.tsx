@@ -14,7 +14,7 @@ import { ThemeSwitch } from "./ThemeSwitch";
 export async function Header() {
   const session = await getServerAuthSession();
   return (
-    <Box py="4" px="6" className="bg-base-100">
+    <Box py="4" px="6" className="bg-base-100 h-30">
       <Flex justify="between" align="center">
         <Heading size="5">
           <Link href={"/"} className="text-neutral-200">
