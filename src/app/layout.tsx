@@ -28,12 +28,10 @@ export default function RootLayout({
               <Theme className="bg-base-100">
                 <Flex style={{ minHeight: "100vh" }} direction="column">
                   <Header />
-                  <Box style={{ flex: 1 }}>
-                    <Flex direction={"row"}>
-                      <Sidebar />
-                      <Box>{children}</Box>
-                    </Flex>
-                  </Box>
+                  <Flex className="flex-1" gap={"4"}>
+                    <Sidebar />
+                    <Box className="flex-1">{children}</Box>
+                  </Flex>
                   <Separator size="4" className="bg-base-300" />
                   <Footer />
                 </Flex>

@@ -1,8 +1,9 @@
 "use client";
 
-import { Box, Button, Flex } from "@radix-ui/themes";
+import { Box, Button, Flex, IconButton } from "@radix-ui/themes";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { LuPin, LuPinOff, LuMenu, LuX } from "react-icons/lu";
 
 export function Sidebar() {
   const [isVisible, setIsVisible] = useState(false);
@@ -41,27 +42,33 @@ export function Sidebar() {
 
   return (
     <Flex direction="column">
-      <Button
+      <IconButton
         onClick={() => setIsVisible(!isVisible)}
-        className={`${isVisible ? "hidden" : "block"}`}
+        className={`${
+          isVisible ? "hidden" : "block"
+        } ml-2 flex justify-center items-center`}
+        color="gray"
+        variant="soft"
       >
-        Show Menu
-      </Button>
-      <Box className="flex-1 bg-red-400" onMouseEnter={handleMouseEnter}>
+        <LuMenu />
+      </IconButton>
+      <Box className="flex-1 h-full" onMouseEnter={handleMouseEnter}>
         <Box className="w-[100px] h-1"></Box>
         <Box
           onMouseLeave={handleMouseLeave}
-          className={`w-[200px] h-screen bg-base-200 z-50 ${
+          className={`w-[200px] h-full bg-base-200 z-50 rounded-r-xl
+          ${
             isVisible
               ? isPinned
                 ? "block"
-                : "absolute top-30 left-0"
+                : "absolute top-30 left-0 h-[calc(100vh-65px)]"
               : "hidden"
           }`}
         >
           <Flex justify="end">
             {window.innerWidth >= 1024 && (
-              <Button
+              <IconButton
+                color="gray"
                 onClick={() => {
                   if (isPinned) {
                     setIsVisible(false);
@@ -69,11 +76,13 @@ export function Sidebar() {
                   setIsPinned(!isPinned);
                 }}
               >
-                {isPinned ? "Unpin" : "Pin"}
-              </Button>
+                {isPinned ? <LuPinOff /> : <LuPin />}
+              </IconButton>
             )}
             {window.innerWidth < 1024 && (
-              <Button onClick={() => setIsVisible(false)}>Hide Menu</Button>
+              <IconButton onClick={() => setIsVisible(false)} color="gray">
+                <LuX width={20} height={20} />
+              </IconButton>
             )}
           </Flex>
           <Flex direction="column">
