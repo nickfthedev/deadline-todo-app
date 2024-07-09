@@ -41,34 +41,35 @@ export function Sidebar() {
   };
 
   return (
-    <Flex direction="column">
+    <Flex direction="column" className="mr-5">
       <IconButton
         onClick={() => setIsVisible(!isVisible)}
         className={`${
-          isVisible ? "hidden" : "block"
-        } ml-2 flex justify-center items-center`}
+          isVisible ? "invisible" : "visible"
+        } flex justify-center items-center mt-5 ml-2`}
         color="gray"
         variant="soft"
       >
         <LuMenu />
       </IconButton>
       <Box className="flex-1 h-full" onMouseEnter={handleMouseEnter}>
-        <Box className="w-[100px] h-1"></Box>
         <Box
           onMouseLeave={handleMouseLeave}
-          className={`w-[200px] h-full bg-base-200 z-50 rounded-r-xl
+          className={`w-[200px] h-full shadow bg-base-200 z-50 transition-transform duration-300 
           ${
             isVisible
               ? isPinned
-                ? "block"
-                : "absolute top-30 left-0 h-[calc(100vh-65px)]"
-              : "hidden"
-          }`}
+                ? "block mt-10"
+                : "absolute top-0 left-0 h-[calc(100vh-65px)] transform translate-x-0"
+              : "absolute top-0 left-0 h-[calc(100vh-65px)] transform -translate-x-full"
+          }
+          `}
         >
           <Flex justify="end">
             {window.innerWidth >= 1024 && (
               <IconButton
                 color="gray"
+                className="mt-1 mr-1"
                 onClick={() => {
                   if (isPinned) {
                     setIsVisible(false);
@@ -85,10 +86,25 @@ export function Sidebar() {
               </IconButton>
             )}
           </Flex>
-          <Flex direction="column">
-            <Link href="/">Home</Link>
-            <Link href="/about">About</Link>
-            <Link href="/contact">Contact</Link>
+          <Flex direction="column" gap={"1"} pt={"2"}>
+            <Link
+              className="mr-1 mx-1 p-3 rounded-md hover:bg-link-hover hover:text-white text-sm hover:shadow"
+              href="/"
+            >
+              Home
+            </Link>
+            <Link
+              className="mr-1 mx-1 p-3 rounded-md hover:bg-link-hover hover:text-white text-sm hover:shadow"
+              href="/about"
+            >
+              About
+            </Link>
+            <Link
+              className="mr-1 mx-1 p-3 rounded-md hover:bg-link-hover hover:text-white text-sm hover:shadow"
+              href="/contact"
+            >
+              Contact
+            </Link>
           </Flex>
         </Box>
       </Box>

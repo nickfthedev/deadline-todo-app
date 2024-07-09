@@ -29,6 +29,7 @@ export default {
         error: "var(--color-error)",
         success: "var(--color-success)",
         info: "var(--color-info)",
+        "link-hover": "var(--color-link-hover)",
       },
       animation: {
         draw: "draw 2s linear normal",

@@ -26,12 +26,15 @@ export default function RootLayout({
           <HydrateClient>
             <ThemeProvider attribute="class">
               <Theme className="bg-base-100">
-                <Flex style={{ minHeight: "100vh" }} direction="column">
-                  <Header />
-                  <Flex className="flex-1" gap={"4"}>
+                <Flex direction={"column"} className="min-h-screen">
+                  <Flex className="flex-1">
                     <Sidebar />
-                    <Box className="flex-1">{children}</Box>
+                    <Flex className="flex-grow" direction="column">
+                      <Header />
+                      <Box className="flex-1 mr-5">{children}</Box>
+                    </Flex>
                   </Flex>
+
                   <Separator size="4" className="bg-base-300" />
                   <Footer />
                 </Flex>

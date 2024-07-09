@@ -40,6 +40,7 @@ a {
     --color-error: #fb6f84;
     --color-success: #2bd4bd;
     --color-info: #0ca6e9;
+    --color-link-hover: #3e62dc;
   }
 
   html.dark {
