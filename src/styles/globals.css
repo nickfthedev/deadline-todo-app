@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html,
 body {
   padding: 0;
@@ -13,4 +17,49 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+@layer base {
+  /* Design System Theming */
+  html {
+    --color-base-100: #fcfcfc;
+    --color-base-200: #efefef;
+    --color-base-300: #d9d9d9;
+
+    --color-neutral-100: #000000;
+    --color-neutral-200: #141414;
+    --color-neutral-300: #222222;
+
+    --color-neutral: #141414;
+
+    --color-primary: #c52233;
+    --color-secondary: #a51c30;
+    --color-accent: #a7333f;
+
+    --color-warning: #f4c152;
+    --color-error: #fb6f84;
+    --color-success: #2bd4bd;
+    --color-info: #0ca6e9;
+  }
+
+  html.dark {
+    --color-base-100: #060606;
+    --color-base-200: #141414;
+    --color-base-300: #222222;
+
+    --color-neutral-100: #fcfcfc;
+    --color-neutral-200: #d9d9d9;
+    --color-neutral-300: #b6b6b6;
+
+    --color-neutral: #efefef;
+
+    --color-primary: #c52233;
+    --color-secondary: #a51c30;
+    --color-accent: #a7333f;
+
+    --color-warning: #f4c152;
+    --color-error: #fb6f84;
+    --color-success: #2bd4bd;
+    --color-info: #0ca6e9;
+  }
 }

@@ -73,24 +73,13 @@ export function TimerCard({
       <Card>
         <Flex
           direction={"column"}
-          style={{
-            width: "350px",
-            height: "150px",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+          className="w-[350px] h-[150px] justify-center items-center"
         >
           <Heading as="h4" size={"4"}>
             {title}
           </Heading>
           <Text as="p">{description}</Text>
-          <Text
-            size={"7"}
-            weight={"bold"}
-            style={{
-              fontFamily: "monospace",
-            }}
-          >
+          <Text size={"7"} weight={"bold"} className="font-monospace">
             Loading...
           </Text>
         </Flex>
@@ -145,12 +134,7 @@ export function TimerCard({
       </Flex>
       <Flex
         direction={"column"}
-        style={{
-          width: "350px",
-          height: "150px",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
+        className="w-[350px] h-[150px] justify-center items-center"
       >
         <Heading as="h4" size={"4"}>
           {title}
@@ -159,10 +143,13 @@ export function TimerCard({
         <Text
           size={"7"}
           weight={"bold"}
-          style={{
-            fontFamily: "monospace",
-            color: isNegative ? "red" : "inherit",
-          }}
+          className={`font-monospace ${
+            isNegative
+              ? "text-error"
+              : days === 0 && weeks === 0 && years === 0
+              ? "text-warning"
+              : "text-neutral-100"
+          }`}
         >
           {isNegative && "-"}
           {years > 0 && <Text>{years}Y:</Text>}

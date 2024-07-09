@@ -2,8 +2,13 @@ import "~/styles/globals.css";
 
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
-import { Theme } from "@radix-ui/themes";
+import { Theme, Box, Flex, Separator, Button } from "@radix-ui/themes";
 import { TRPCReactProvider } from "~/trpc/react";
+import { Footer } from "./_components/Footer";
+import { Header } from "./_components/Header";
+import { HydrateClient } from "~/trpc/server";
+import { Sidebar } from "./_components/Sidebar";
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -15,10 +20,26 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html suppressHydrationWarning lang="en">
       <body className={GeistSans.className}>
         <TRPCReactProvider>
-          <Theme appearance="dark">{children}</Theme>
+          <HydrateClient>
+            <ThemeProvider attribute="class">
+              <Theme className="bg-base-100">
+                <Flex style={{ minHeight: "100vh" }} direction="column">
+                  <Header />
+                  <Box style={{ flex: 1 }}>
+                    <Flex direction={"row"}>
+                      <Sidebar />
+                      <Box>{children}</Box>
+                    </Flex>
+                  </Box>
+                  <Separator size="4" className="bg-base-300" />
+                  <Footer />
+                </Flex>
+              </Theme>
+            </ThemeProvider>
+          </HydrateClient>
         </TRPCReactProvider>
       </body>
     </html>
