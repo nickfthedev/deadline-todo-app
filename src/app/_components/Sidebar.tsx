@@ -1,11 +1,56 @@
 "use client";
 
-import { Box, Button, Flex, Heading, IconButton } from "@radix-ui/themes";
+import {
+  Box,
+  Button,
+  DropdownMenu,
+  Flex,
+  Heading,
+  IconButton,
+} from "@radix-ui/themes";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { LuPin, LuPinOff, LuMenu, LuX } from "react-icons/lu";
+import { LuPin, LuPinOff, LuMenu, LuX, LuMoreHorizontal } from "react-icons/lu";
+import { getServerAuthSession } from "~/server/auth";
+import { AddTagDialog } from "./addTagDialog";
+import { api } from "~/trpc/react";
+import { Tags } from "@prisma/client";
 
-export function Sidebar() {
+const SubHeading = ({ title }: { title: string }) => (
+  <Flex direction="column" gap={"1"} pt={"2"}>
+    <Heading className="ml-2 text-sm font-semibold text-base-300">
+      {title}
+    </Heading>
+  </Flex>
+);
+
+const TagLink = ({ tag }: { tag: Tags }) => (
+  <Link
+    className="mr-1 mx-1 p-3 rounded-md items-center flex justify-between hover:bg-link-hover hover:text-white text-sm hover:shadow"
+    href={`/timer/?tag=${tag.handle}`}
+  >
+    {tag.name}
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger>
+        <IconButton variant="ghost" size={"1"}>
+          <LuMoreHorizontal />
+        </IconButton>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Content>
+        <DropdownMenu.Item>Edit</DropdownMenu.Item>
+
+        <DropdownMenu.Separator />
+        <DropdownMenu.Item color="red">Delete</DropdownMenu.Item>
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
+  </Link>
+);
+
+export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
+  // Data Querys
+  const tags = api.tags.getAllTagsByUserID.useQuery();
+
+  // Open, Close, Pin Logic
   const [isVisible, setIsVisible] = useState(false);
   const [isPinned, setIsPinned] = useState(() => {
     if (typeof window !== "undefined") {
@@ -138,9 +183,7 @@ export function Sidebar() {
                 </Heading>
               </Flex>
             )}
-            <Heading className="ml-2 text-sm font-semibold text-base-300">
-              Subheader
-            </Heading>
+            <SubHeading title="Navigation" />
             <Link
               className="mr-1 mx-1 p-3 rounded-md hover:bg-link-hover hover:text-white text-sm hover:shadow"
               href="/"
@@ -159,6 +202,18 @@ export function Sidebar() {
             >
               Contact
             </Link>
+            {loggedIn && (
+              <>
+                <SubHeading title="Tags" />
+                <TagLink
+                  tag={{ id: "all", name: "All", userId: "", handle: "all" }}
+                />
+                {tags.data?.map((tag) => (
+                  <TagLink key={tag.id} tag={tag} />
+                ))}
+                <AddTagDialog />
+              </>
+            )}
           </Flex>
         </Box>
       </Box>

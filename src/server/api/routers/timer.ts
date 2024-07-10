@@ -37,6 +37,11 @@ export const timerRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       return ctx.db.timer.update({ where: { id: input.id, user: { id: ctx.session.user.id } }, data: { done: true } });
     }),
+  markAsUndone: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.timer.update({ where: { id: input.id, user: { id: ctx.session.user.id } }, data: { done: false } });
+    }),
   getTimerByTimerID: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(({ ctx, input }) => {
@@ -49,7 +54,13 @@ export const timerRouter = createTRPCRouter({
     .query(({ ctx, input }) => {
       return ctx.db.timer.findMany({
         where: { user: { id: ctx.session.user.id }, done: input.showDone === true ? true : false },
-        orderBy: { date: "asc" },
+        orderBy:
+          input.showDone ?
+            {
+              updatedAt: "desc"
+            }
+            :
+            { date: "asc" },
       });
     }),
 });

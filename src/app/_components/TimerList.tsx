@@ -3,13 +3,26 @@
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { TimerCard } from "./TimerCard";
-import { Flex } from "@radix-ui/themes";
+import { Button, Flex } from "@radix-ui/themes";
 import * as Toast from "@radix-ui/react-toast";
+import { CreateTimerDialog } from "./createTimerDialog";
+import { TimerCardSkeleton } from "./TimerCardSkeleton";
 
 export function TimerList() {
   const { data: timers, isLoading } = api.timer.getAllTimersByUserID.useQuery({
     showDone: false,
   });
+
+  const [loadDoneTimers, setLoadDoneTimers] = useState(false);
+  const { data: doneTimers, isLoading: doneTimersLoading } =
+    api.timer.getAllTimersByUserID.useQuery(
+      {
+        showDone: true,
+      },
+      {
+        enabled: loadDoneTimers, // Only run the query when loadDoneTimers is true
+      }
+    );
 
   // TODO Prefetch? See page copy.tsx
 
@@ -21,14 +34,47 @@ export function TimerList() {
     setToastOpen(true);
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <Flex gap={"3"} justify={"center"} wrap={"wrap"}>
+        <TimerCardSkeleton />
+        <TimerCardSkeleton />
+      </Flex>
+    );
   // TODO: Move up the toast to layout
   return (
     <>
       <Flex gap={"3"} justify={"center"} wrap={"wrap"}>
         {timers?.map((timer) => (
-          <TimerCard key={timer.id} {...timer} showToast={showToast} />
+          <TimerCard
+            key={timer.id}
+            {...timer}
+            showToast={showToast}
+            updatedAt={timer.updatedAt}
+          />
         ))}
+      </Flex>
+      <Flex justify={"center"} mt={"4"} gap={"4"}>
+        <CreateTimerDialog />
+        <Button
+          variant="soft"
+          color="gray"
+          onClick={() => setLoadDoneTimers(!loadDoneTimers)}
+        >
+          {loadDoneTimers ? "Hide Done Tasks" : "Show Done Tasks"}
+        </Button>
+      </Flex>
+      <Flex gap={"3"} justify={"center"} wrap={"wrap"}>
+        {loadDoneTimers &&
+          doneTimers?.map((timer) => (
+            <TimerCard
+              key={timer.id}
+              {...timer}
+              showToast={showToast}
+              doneMode={true}
+              updatedAt={timer.updatedAt}
+            />
+          ))}
       </Flex>
       <Toast.Provider swipeDirection="right">
         <Toast.Root

@@ -45,8 +45,8 @@ a {
 
   html.dark {
     --color-base-100: #060606;
-    --color-base-200: #141414;
-    --color-base-300: #222222;
+    --color-base-200: #101010;
+    --color-base-300: #1a1a1a;
 
     --color-neutral-100: #fcfcfc;
     --color-neutral-200: #d9d9d9;

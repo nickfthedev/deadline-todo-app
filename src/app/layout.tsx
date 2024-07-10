@@ -9,6 +9,7 @@ import { Header } from "./_components/Header";
 import { HydrateClient } from "~/trpc/server";
 import { Sidebar } from "./_components/Sidebar";
 import { ThemeProvider } from "next-themes";
+import { getServerAuthSession } from "~/server/auth";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -16,9 +17,10 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const session = await getServerAuthSession();
   return (
     <html suppressHydrationWarning lang="en">
       <body className={GeistSans.className}>
@@ -28,7 +30,7 @@ export default function RootLayout({
               <Theme className="bg-base-100">
                 <Flex direction={"column"} className="min-h-screen">
                   <Flex className="flex-1">
-                    <Sidebar />
+                    <Sidebar loggedIn={session !== null} />
                     <Flex className="flex-grow" direction="column">
                       <Header />
                       <Box className="flex-1 mr-5">{children}</Box>

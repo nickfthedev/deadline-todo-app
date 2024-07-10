@@ -2,6 +2,7 @@ import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import "@radix-ui/themes/styles.css";
 import { timerRouter } from "./routers/timer";
+import { tagsRouter } from "./routers/tags";
 
 /**
  * This is the primary router for your server.
@@ -11,8 +12,8 @@ import { timerRouter } from "./routers/timer";
 export const appRouter = createTRPCRouter({
   post: postRouter,
   timer: timerRouter,
+  tags: tagsRouter,
 });
-
 // export type definition of API
 export type AppRouter = typeof appRouter;
 

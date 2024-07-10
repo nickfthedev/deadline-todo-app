@@ -18,6 +18,8 @@ interface TimerCardProps {
   title: string;
   description: string;
   date: Date;
+  doneMode?: boolean;
+  updatedAt?: Date;
   showToast: (message: string) => void;
 }
 
@@ -25,7 +27,9 @@ export function TimerCard({
   id,
   title,
   description,
+  updatedAt,
   date,
+  doneMode = false,
   showToast,
 }: TimerCardProps) {
   const utils = api.useUtils();
@@ -51,6 +55,13 @@ export function TimerCard({
     },
   });
 
+  const mutateMarkAsUndone = api.timer.markAsUndone.useMutation({
+    onSuccess: () => {
+      utils.timer.getAllTimersByUserID.invalidate();
+      showToast("Timer marked as undone");
+    },
+  });
+
   const handleDeleteTimer = () => {
     mutateDeleteTimer.mutate({ id });
   };
@@ -59,18 +70,28 @@ export function TimerCard({
     mutateMarkAsDone.mutate({ id });
   };
 
-  useEffect(() => {
-    setIsClient(true);
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+  const handleMarkAsUndone = () => {
+    mutateMarkAsUndone.mutate({ id });
+  };
 
-    return () => clearInterval(interval);
-  }, []);
+  if (!doneMode) {
+    useEffect(() => {
+      setIsClient(true);
+      const interval = setInterval(() => {
+        setCurrentTime(new Date());
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }, []);
+  } else {
+    useEffect(() => {
+      setIsClient(true);
+    }, []);
+  }
 
   if (!isClient) {
     return (
-      <Card>
+      <Card className="bg-base-300">
         <Flex
           direction={"column"}
           className="w-[350px] h-[150px] justify-center items-center"
@@ -88,24 +109,44 @@ export function TimerCard({
   }
 
   const delta = date.getTime() - currentTime.getTime();
-  const isNegative = delta < 0;
   const absDelta = Math.abs(delta);
+  let isNegative = delta < 0;
+  let isPositive = delta > 0;
 
-  const years = Math.floor(absDelta / (1000 * 60 * 60 * 24 * 365));
-  const weeks = Math.floor(
+  let years = Math.floor(absDelta / (1000 * 60 * 60 * 24 * 365));
+  let weeks = Math.floor(
     (absDelta % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 7)
   );
-  const days = Math.floor(
+  let days = Math.floor(
     (absDelta % (1000 * 60 * 60 * 24 * 7)) / (1000 * 60 * 60 * 24)
   );
-  const hours = Math.floor(
-    (absDelta % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-  );
-  const minutes = Math.floor((absDelta % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((absDelta % (1000 * 60)) / 1000);
+  let hours = Math.floor((absDelta % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  let minutes = Math.floor((absDelta % (1000 * 60 * 60)) / (1000 * 60));
+  let seconds = Math.floor((absDelta % (1000 * 60)) / 1000);
+
+  // Calc the delta between updatedat and time when in done mode
+  if (doneMode && updatedAt) {
+    const updatedDelta = updatedAt.getTime() - date.getTime();
+    const updatedAbsDelta = Math.abs(updatedDelta);
+    isNegative = updatedDelta < 0;
+
+    years = Math.floor(updatedAbsDelta / (1000 * 60 * 60 * 24 * 365));
+    weeks = Math.floor(
+      (updatedAbsDelta % (1000 * 60 * 60 * 24 * 365)) /
+        (1000 * 60 * 60 * 24 * 7)
+    );
+    days = Math.floor(
+      (updatedAbsDelta % (1000 * 60 * 60 * 24 * 7)) / (1000 * 60 * 60 * 24)
+    );
+    hours = Math.floor(
+      (updatedAbsDelta % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
+    minutes = Math.floor((updatedAbsDelta % (1000 * 60 * 60)) / (1000 * 60));
+    seconds = Math.floor((updatedAbsDelta % (1000 * 60)) / 1000);
+  }
 
   return (
-    <Card>
+    <Card className="bg-base-300">
       <EditTimerDialog
         timer={{ id, title, description, date }}
         isOpen={isDialogOpen}
@@ -119,12 +160,21 @@ export function TimerCard({
             </Button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content>
-            <DropdownMenu.Item onSelect={handleOpenDialog}>
-              Edit
-            </DropdownMenu.Item>
-            <DropdownMenu.Item onSelect={handleMarkAsDone}>
-              Mark as Done
-            </DropdownMenu.Item>
+            {!doneMode && (
+              <DropdownMenu.Item onSelect={handleOpenDialog}>
+                Edit
+              </DropdownMenu.Item>
+            )}
+            {!doneMode && (
+              <DropdownMenu.Item onSelect={handleMarkAsDone}>
+                Mark as Done
+              </DropdownMenu.Item>
+            )}
+            {doneMode && (
+              <DropdownMenu.Item onSelect={handleMarkAsUndone}>
+                Mark as Undone
+              </DropdownMenu.Item>
+            )}
             <DropdownMenu.Separator />
             <DropdownMenu.Item color="red" onSelect={handleDeleteTimer}>
               Delete
@@ -144,12 +194,24 @@ export function TimerCard({
           size={"7"}
           weight={"bold"}
           className={`font-monospace ${
-            isNegative
+            !doneMode && isNegative
               ? "text-error"
-              : days === 0 && weeks === 0 && years === 0
+              : !doneMode && days === 0 && weeks === 0 && years === 0
               ? "text-warning"
               : "text-neutral-100"
-          }`}
+          } 
+          ${doneMode && (years > 0 || weeks > 0 || days > 0) && " text-red-500"}
+          ${
+            doneMode &&
+            !isNegative &&
+            years === 0 &&
+            weeks === 0 &&
+            days === 0 &&
+            hours > 1 &&
+            " text-warning"
+          }
+          ${doneMode && isNegative && " text-green-400"}
+          `}
         >
           {isNegative && "-"}
           {years > 0 && <Text>{years}Y:</Text>}
@@ -159,6 +221,17 @@ export function TimerCard({
           <Text>{minutes.toString().padStart(2, "0")}M:</Text>
           <Text>{seconds.toString().padStart(2, "0")}S</Text>
         </Text>
+        <Flex direction={"column"}>
+          <Text size={"1"} className="opacity-50 font-semibold">
+            Due: {date.toLocaleDateString()} at {date.toLocaleTimeString()}
+          </Text>
+          {doneMode && (
+            <Text size={"1"} className="opacity-50 font-semibold">
+              Done: {updatedAt?.toLocaleDateString()} at{" "}
+              {updatedAt?.toLocaleTimeString()}
+            </Text>
+          )}
+        </Flex>
       </Flex>
     </Card>
   );

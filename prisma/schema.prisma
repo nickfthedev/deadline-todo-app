@@ -64,6 +64,7 @@ model User {
     sessions      Session[]
     posts         Post[]
     timers        Timer[]
+    tags          Tags[]
 }
 
 model VerificationToken {
@@ -85,4 +86,15 @@ model Timer {
     
     userId      String
     user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    tags        Tags[]
+}
+
+model Tags {
+    id          String   @id @default(cuid())
+    name        String
+    handle      String
+    userId      String
+    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    timers      Timer[]
 }

@@ -26,7 +26,7 @@ export default {
         accent: "var(--color-accent)",
 
         warning: "var(--color-warning)",
-        error: "var(--color-error)",
+        "error": "var(--color-error)",
         success: "var(--color-success)",
         info: "var(--color-info)",
         "link-hover": "var(--color-link-hover)",

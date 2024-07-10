@@ -19,9 +19,6 @@ export default async function Home() {
         <Flex gap={"3"} justify={"center"} wrap={"wrap"}>
           <TimerList />
         </Flex>
-        <Flex justify={"center"} mt={"4"}>
-          <CreateTimerDialog />
-        </Flex>
       </Box>
     </Flex>
   );
