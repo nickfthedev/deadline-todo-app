@@ -16,11 +16,7 @@ export async function Header() {
   return (
     <Box py="4" px="6" className="bg-base-100 h-[60px]">
       <Flex justify="between" align="center">
-        <Heading size="5">
-          <Link href={"/"} className="text-neutral-200">
-            Header
-          </Link>
-        </Heading>
+        <Box></Box>
         <Flex direction="row" gap={"3"} align={"center"}>
           <ThemeSwitch />
           {session && (
