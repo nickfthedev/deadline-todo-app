@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  AlertDialog,
   Button,
   Card,
   DropdownMenu,
@@ -36,10 +37,16 @@ export function TimerCard({
 
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isClient, setIsClient] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  // Edit Dialog Control
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const handleOpenDialog = () => setIsDialogOpen(true);
   const handleCloseDialog = () => setIsDialogOpen(false);
+
+  // Delete Dialog Control
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const handleOpenDeleteDialog = () => setIsDeleteDialogOpen(true);
+  const handleCloseDeleteDialog = () => setIsDeleteDialogOpen(false);
 
   const mutateDeleteTimer = api.timer.deleteTimer.useMutation({
     onSuccess: () => {
@@ -152,6 +159,7 @@ export function TimerCard({
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
       />
+
       <Flex justify={"end"}>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
@@ -176,7 +184,7 @@ export function TimerCard({
               </DropdownMenu.Item>
             )}
             <DropdownMenu.Separator />
-            <DropdownMenu.Item color="red" onSelect={handleDeleteTimer}>
+            <DropdownMenu.Item color="red" onSelect={handleOpenDeleteDialog}>
               Delete
             </DropdownMenu.Item>
           </DropdownMenu.Content>
@@ -210,7 +218,7 @@ export function TimerCard({
             hours > 1 &&
             " text-warning"
           }
-          ${doneMode && isNegative && " text-green-400"}
+          ${doneMode && isNegative && " text-green-500"}
           `}
         >
           {isNegative && "-"}
@@ -233,6 +241,32 @@ export function TimerCard({
           )}
         </Flex>
       </Flex>
+
+      <AlertDialog.Root
+        open={isDeleteDialogOpen}
+        onOpenChange={handleCloseDeleteDialog}
+      >
+        <AlertDialog.Content maxWidth="450px">
+          <AlertDialog.Title>Delete Tag</AlertDialog.Title>
+          <AlertDialog.Description size="2">
+            Are you sure? This tag will be deleted and any timers associated
+            with it will be untagged.
+          </AlertDialog.Description>
+
+          <Flex gap="3" mt="4" justify="end">
+            <AlertDialog.Cancel>
+              <Button variant="soft" color="gray">
+                Cancel
+              </Button>
+            </AlertDialog.Cancel>
+            <AlertDialog.Action>
+              <Button variant="solid" color="red" onClick={handleDeleteTimer}>
+                Delete Tag
+              </Button>
+            </AlertDialog.Action>
+          </Flex>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
     </Card>
   );
 }

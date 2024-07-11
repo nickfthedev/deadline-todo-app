@@ -15,6 +15,8 @@ import { getServerAuthSession } from "~/server/auth";
 import { AddTagDialog } from "./addTagDialog";
 import { api } from "~/trpc/react";
 import { Tags } from "@prisma/client";
+import { EditTagDialog } from "./editTagDialog";
+import { ConfirmDeleteTag } from "./confirmDeleteTag";
 
 const SubHeading = ({ title }: { title: string }) => (
   <Flex direction="column" gap={"1"} pt={"2"}>
@@ -24,25 +26,36 @@ const SubHeading = ({ title }: { title: string }) => (
   </Flex>
 );
 
-const TagLink = ({ tag }: { tag: Tags }) => (
+const TagLink = ({
+  tag,
+  onEdit,
+  onDelete,
+}: {
+  tag: Tags;
+  onEdit: () => void;
+  onDelete: () => void;
+}) => (
   <Link
     className="mr-1 mx-1 p-3 rounded-md items-center flex justify-between hover:bg-link-hover hover:text-white text-sm hover:shadow"
     href={`/timer/?tag=${tag.handle}`}
   >
     {tag.name}
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger>
-        <IconButton variant="ghost" size={"1"}>
-          <LuMoreHorizontal />
-        </IconButton>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
-        <DropdownMenu.Item>Edit</DropdownMenu.Item>
-
-        <DropdownMenu.Separator />
-        <DropdownMenu.Item color="red">Delete</DropdownMenu.Item>
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
+    {tag.handle !== "all" && (
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger>
+          <IconButton variant="ghost" size={"1"}>
+            <LuMoreHorizontal />
+          </IconButton>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content>
+          <DropdownMenu.Item onClick={onEdit}>Edit</DropdownMenu.Item>
+          <DropdownMenu.Separator />
+          <DropdownMenu.Item onClick={onDelete} color="red">
+            Delete
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+    )}
   </Link>
 );
 
@@ -60,6 +73,28 @@ export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
   });
   const [innerWidth, setInnerWidth] = useState(800);
   const [hasMounted, setHasMounted] = useState(false);
+
+  // Edit Dialog Control
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedTagForEdit, setSelectedTagForEdit] = useState<Tags | null>(
+    null
+  );
+  const handleOpenEditDialog = (tag: Tags) => {
+    setSelectedTagForEdit(tag);
+    setIsEditDialogOpen(true);
+  };
+  const handleCloseEditDialog = () => setIsEditDialogOpen(false);
+
+  // Delete Dialog Control
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedTagForDelete, setSelectedTagForDelete] = useState<Tags | null>(
+    null
+  );
+  const handleOpenDeleteDialog = (tag: Tags) => {
+    setSelectedTagForDelete(tag);
+    setIsDeleteDialogOpen(true);
+  };
+  const handleCloseDeleteDialog = () => setIsDeleteDialogOpen(false);
 
   useEffect(() => {
     setHasMounted(true);
@@ -207,9 +242,46 @@ export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
                 <SubHeading title="Tags" />
                 <TagLink
                   tag={{ id: "all", name: "All", userId: "", handle: "all" }}
+                  onEdit={() =>
+                    handleOpenEditDialog({
+                      id: "all",
+                      name: "All",
+                      userId: "",
+                      handle: "all",
+                    })
+                  }
+                  onDelete={() =>
+                    handleOpenDeleteDialog({
+                      id: "all",
+                      name: "All",
+                      userId: "",
+                      handle: "all",
+                    })
+                  }
                 />
                 {tags.data?.map((tag) => (
-                  <TagLink key={tag.id} tag={tag} />
+                  <>
+                    <TagLink
+                      key={tag.id}
+                      tag={tag}
+                      onEdit={() => handleOpenEditDialog(tag)}
+                      onDelete={() => handleOpenDeleteDialog(tag)}
+                    />
+                    {selectedTagForEdit && (
+                      <EditTagDialog
+                        tag={selectedTagForEdit}
+                        isOpen={isEditDialogOpen}
+                        onClose={handleCloseEditDialog}
+                      />
+                    )}
+                    {selectedTagForDelete && (
+                      <ConfirmDeleteTag
+                        tag={selectedTagForDelete}
+                        isOpen={isDeleteDialogOpen}
+                        onClose={handleCloseDeleteDialog}
+                      />
+                    )}
+                  </>
                 ))}
                 <AddTagDialog />
               </>

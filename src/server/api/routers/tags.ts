@@ -53,7 +53,7 @@ export const tagsRouter = createTRPCRouter({
   deleteTag: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.timer.delete({ where: { id: input.id, user: { id: ctx.session.user.id } } });
+      return ctx.db.tags.delete({ where: { id: input.id, user: { id: ctx.session.user.id } } });
     }),
   getTagByTagID: protectedProcedure
     .input(z.object({ id: z.string() }))
