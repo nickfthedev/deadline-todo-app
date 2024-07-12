@@ -8,7 +8,7 @@ import {
   TextField,
   Callout,
 } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "~/trpc/react";
 
 interface Timer {
@@ -36,15 +36,15 @@ export function EditTimerDialog({
     timer.date.toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
-    })
+    }),
   );
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const editTimerMutation = api.timer.editTimer.useMutation({
-    onSuccess: () => {
-      utils.timer.getAllTimersByUserID.invalidate();
+    onSuccess: async () => {
+      await utils.timer.getAllTimersByUserID.invalidate();
       setSuccessMessage("Timer edited successfully");
     },
     onError: () => {

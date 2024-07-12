@@ -1,4 +1,4 @@
-import { Tags } from "@prisma/client";
+import type { Tags } from "@prisma/client";
 import { AlertDialog, Button, Flex } from "@radix-ui/themes";
 import { api } from "~/trpc/react";
 
@@ -14,8 +14,8 @@ export function ConfirmDeleteTag({
   const utils = api.useUtils();
 
   const deleteTagMutation = api.tags.deleteTag.useMutation({
-    onSuccess: () => {
-      utils.tags.getAllTagsByUserID.invalidate();
+    onSuccess: async () => {
+      await utils.tags.getAllTagsByUserID.invalidate();
     },
   });
 

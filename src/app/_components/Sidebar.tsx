@@ -1,20 +1,12 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  DropdownMenu,
-  Flex,
-  Heading,
-  IconButton,
-} from "@radix-ui/themes";
+import { Box, DropdownMenu, Flex, Heading, IconButton } from "@radix-ui/themes";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LuPin, LuPinOff, LuMenu, LuX, LuMoreHorizontal } from "react-icons/lu";
-import { getServerAuthSession } from "~/server/auth";
 import { AddTagDialog } from "./addTagDialog";
 import { api } from "~/trpc/react";
-import { Tags } from "@prisma/client";
+import type { Tags } from "@prisma/client";
 import { EditTagDialog } from "./editTagDialog";
 import { ConfirmDeleteTag } from "./confirmDeleteTag";
 
@@ -77,7 +69,7 @@ export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
   // Edit Dialog Control
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedTagForEdit, setSelectedTagForEdit] = useState<Tags | null>(
-    null
+    null,
   );
   const handleOpenEditDialog = (tag: Tags) => {
     setSelectedTagForEdit(tag);
@@ -88,7 +80,7 @@ export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
   // Delete Dialog Control
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedTagForDelete, setSelectedTagForDelete] = useState<Tags | null>(
-    null
+    null,
   );
   const handleOpenDeleteDialog = (tag: Tags) => {
     setSelectedTagForDelete(tag);
@@ -177,7 +169,7 @@ export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
       >
         <Box
           onMouseLeave={handleMouseLeave}
-          className={`w-[200px] h-full shadow bg-base-200 z-50 transition-transform duration-300 
+          className={`w-[200px] h-full shadow bg-base-200 z-50 transition-transform duration-300
           ${
             isVisible
               ? isPinned

@@ -2,7 +2,7 @@ import "~/styles/globals.css";
 
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
-import { Theme, Box, Flex, Separator, Button } from "@radix-ui/themes";
+import { Theme, Box, Flex, Separator } from "@radix-ui/themes";
 import { TRPCReactProvider } from "~/trpc/react";
 import { Footer } from "./_components/Footer";
 import { Header } from "./_components/Header";

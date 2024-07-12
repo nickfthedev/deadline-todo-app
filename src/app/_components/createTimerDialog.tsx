@@ -8,7 +8,7 @@ import {
   TextField,
   Callout,
 } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "~/trpc/react";
 
 export function CreateTimerDialog() {
@@ -21,15 +21,15 @@ export function CreateTimerDialog() {
     new Date().toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
-    })
+    }),
   );
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const createTimerMutation = api.timer.createTimer.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       setSuccessMessage("Timer created successfully");
-      utils.timer.getAllTimersByUserID.invalidate();
+      await utils.timer.getAllTimersByUserID.invalidate();
       setTitle("");
       setDescription("");
       setDate(new Date().toISOString().split("T")[0]);
@@ -37,7 +37,7 @@ export function CreateTimerDialog() {
         new Date().toLocaleTimeString("en-GB", {
           hour: "2-digit",
           minute: "2-digit",
-        })
+        }),
       );
     },
     onError: () => {

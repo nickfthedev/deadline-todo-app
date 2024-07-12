@@ -28,10 +28,10 @@ export function EditTagDialog({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const editTagMutation = api.tags.editTag.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       setSuccessMessage("Tag edited successfully");
       setName("");
-      utils.tags.getAllTagsByUserID.invalidate();
+      await utils.tags.getAllTagsByUserID.invalidate();
     },
     onError: () => {
       setErrorMessage("There was an error editing the tag");

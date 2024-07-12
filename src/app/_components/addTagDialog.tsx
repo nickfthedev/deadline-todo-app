@@ -8,7 +8,7 @@ import {
   TextField,
   Callout,
 } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "~/trpc/react";
 
 export function AddTagDialog() {
@@ -19,10 +19,10 @@ export function AddTagDialog() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const createTagMutation = api.tags.createTag.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       setSuccessMessage("Tag created successfully");
       setName("");
-      utils.tags.getAllTagsByUserID.invalidate();
+      await utils.tags.getAllTagsByUserID.invalidate();
     },
     onError: () => {
       setErrorMessage("There was an error creating the tag");
