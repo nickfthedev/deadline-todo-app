@@ -62,6 +62,13 @@ export const tagsRouter = createTRPCRouter({
         where: { id: input.id, user: { id: ctx.session.user.id } },
       });
     }),
+  getTagByHandle: protectedProcedure
+    .input(z.object({ handle: z.string() }))
+    .query(({ ctx, input }) => {
+      return ctx.db.tags.findFirst({
+        where: { handle: input.handle, user: { id: ctx.session.user.id } },
+      });
+    }),
   getAllTagsByUserID: protectedProcedure
     .query(({ ctx }) => {
       return ctx.db.tags.findMany({

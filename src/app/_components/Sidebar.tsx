@@ -2,7 +2,7 @@
 
 import { Box, DropdownMenu, Flex, Heading, IconButton } from "@radix-ui/themes";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { LuPin, LuPinOff, LuMenu, LuX, LuMoreHorizontal } from "react-icons/lu";
 import { AddTagDialog } from "./addTagDialog";
 import { api } from "~/trpc/react";
@@ -69,7 +69,7 @@ export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
   // Edit Dialog Control
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedTagForEdit, setSelectedTagForEdit] = useState<Tags | null>(
-    null,
+    null
   );
   const handleOpenEditDialog = (tag: Tags) => {
     setSelectedTagForEdit(tag);
@@ -80,7 +80,7 @@ export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
   // Delete Dialog Control
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedTagForDelete, setSelectedTagForDelete] = useState<Tags | null>(
-    null,
+    null
   );
   const handleOpenDeleteDialog = (tag: Tags) => {
     setSelectedTagForDelete(tag);
@@ -252,9 +252,8 @@ export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
                   }
                 />
                 {tags.data?.map((tag) => (
-                  <>
+                  <Fragment key={tag.id}>
                     <TagLink
-                      key={tag.id}
                       tag={tag}
                       onEdit={() => handleOpenEditDialog(tag)}
                       onDelete={() => handleOpenDeleteDialog(tag)}
@@ -273,7 +272,7 @@ export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
                         onClose={handleCloseDeleteDialog}
                       />
                     )}
-                  </>
+                  </Fragment>
                 ))}
                 <AddTagDialog />
               </>

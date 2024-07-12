@@ -14,6 +14,11 @@ import { FiMoreHorizontal } from "react-icons/fi";
 import { EditTimerDialog } from "./editTimerDialog";
 import { api } from "~/trpc/react";
 
+interface Tag {
+  id: string;
+  name: string;
+}
+
 interface TimerCardProps {
   id: string;
   title: string;
@@ -21,6 +26,7 @@ interface TimerCardProps {
   date: Date;
   doneMode?: boolean;
   updatedAt?: Date;
+  tags: Tag[];
   showToast: (message: string) => void;
 }
 
@@ -32,6 +38,7 @@ export function TimerCard({
   date,
   doneMode = false,
   showToast,
+  tags,
 }: TimerCardProps) {
   const utils = api.useUtils();
 
@@ -156,6 +163,7 @@ export function TimerCard({
     <Card className="bg-base-300">
       <EditTimerDialog
         timer={{ id, title, description, date }}
+        tags={tags}
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
       />

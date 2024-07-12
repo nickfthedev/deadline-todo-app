@@ -1,5 +1,6 @@
 "use client";
 
+import { Tags } from "@prisma/client";
 import {
   Dialog,
   Button,
@@ -7,13 +8,22 @@ import {
   Flex,
   TextField,
   Callout,
+  DropdownMenu,
 } from "@radix-ui/themes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
 
 export function CreateTimerDialog() {
   const utils = api.useUtils();
 
+  //Handle Tag List
+  const [isOpen, setIsOpen] = useState(false);
+  const { data: tagList, isLoading: tagsLoading } =
+    api.tags.getAllTagsByUserID.useQuery(undefined, {
+      enabled: isOpen,
+    });
+
+  //Handle Input
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
@@ -21,10 +31,11 @@ export function CreateTimerDialog() {
     new Date().toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
-    }),
+    })
   );
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [checkedTags, setCheckedTags] = useState<string[]>([]);
 
   const createTimerMutation = api.timer.createTimer.useMutation({
     onSuccess: async () => {
@@ -37,8 +48,9 @@ export function CreateTimerDialog() {
         new Date().toLocaleTimeString("en-GB", {
           hour: "2-digit",
           minute: "2-digit",
-        }),
+        })
       );
+      setCheckedTags([]);
     },
     onError: () => {
       setErrorMessage("There was an error creating the timer");
@@ -50,12 +62,14 @@ export function CreateTimerDialog() {
       title,
       description,
       date: new Date(date + "T" + time),
+      tagId: checkedTags,
     });
   };
 
   return (
     <Dialog.Root
       onOpenChange={(open) => {
+        setIsOpen(open);
         if (!open) {
           setSuccessMessage(null);
           setErrorMessage(null);
@@ -141,6 +155,32 @@ export function CreateTimerDialog() {
               </Text>
             )}
           </label>
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+              <Button variant="soft">
+                Select Tags
+                <DropdownMenu.TriggerIcon />
+              </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              {tagList?.map((tag) => (
+                <DropdownMenu.CheckboxItem
+                  key={tag.id}
+                  checked={checkedTags.includes(tag.id)}
+                  onSelect={(e) => e.preventDefault()}
+                  onCheckedChange={(e) => {
+                    setCheckedTags(
+                      e
+                        ? [...checkedTags, tag.id]
+                        : checkedTags.filter((id) => id !== tag.id)
+                    );
+                  }}
+                >
+                  {tag.name}
+                </DropdownMenu.CheckboxItem>
+              ))}
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
         </Flex>
 
         <Flex gap="3" mt="4" justify="end">

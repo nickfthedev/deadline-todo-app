@@ -7,6 +7,7 @@ import {
   Flex,
   TextField,
   Callout,
+  DropdownMenu,
 } from "@radix-ui/themes";
 import { useState } from "react";
 import { api } from "~/trpc/react";
@@ -18,16 +19,29 @@ interface Timer {
   date: Date;
 }
 
+interface Tag {
+  id: string;
+  name: string;
+}
+
 export function EditTimerDialog({
   timer,
   isOpen,
   onClose,
+  tags,
 }: {
   timer: Timer;
+  tags: Tag[];
   isOpen: boolean;
   onClose: () => void;
 }) {
   const utils = api.useUtils();
+
+  //Handle Tag List
+  const { data: tagList, isLoading: tagsLoading } =
+    api.tags.getAllTagsByUserID.useQuery(undefined, {
+      enabled: isOpen,
+    });
 
   const [title, setTitle] = useState(timer.title);
   const [description, setDescription] = useState(timer.description);
@@ -36,7 +50,10 @@ export function EditTimerDialog({
     timer.date.toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
-    }),
+    })
+  );
+  const [checkedTags, setCheckedTags] = useState<string[]>(
+    tags.map((tag) => tag.id)
   );
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -58,6 +75,7 @@ export function EditTimerDialog({
       title,
       description,
       date: new Date(date + "T" + time),
+      tagId: checkedTags,
     });
   };
   return (
@@ -145,6 +163,33 @@ export function EditTimerDialog({
               </Text>
             )}
           </label>
+
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+              <Button variant="soft">
+                Select Tags
+                <DropdownMenu.TriggerIcon />
+              </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              {tagList?.map((tag) => (
+                <DropdownMenu.CheckboxItem
+                  key={tag.id}
+                  checked={checkedTags.includes(tag.id)}
+                  onSelect={(e) => e.preventDefault()}
+                  onCheckedChange={(e) => {
+                    setCheckedTags(
+                      e
+                        ? [...checkedTags, tag.id]
+                        : checkedTags.filter((id) => id !== tag.id)
+                    );
+                  }}
+                >
+                  {tag.name}
+                </DropdownMenu.CheckboxItem>
+              ))}
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
         </Flex>
 
         <Flex gap="3" mt="4" justify="end">

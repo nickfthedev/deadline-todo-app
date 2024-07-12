@@ -1,21 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { TimerCard } from "./TimerCard";
-import { Button, Flex, Text } from "@radix-ui/themes";
+import { Badge, Button, Flex, Text } from "@radix-ui/themes";
 import * as Toast from "@radix-ui/react-toast";
 import { CreateTimerDialog } from "./createTimerDialog";
 import { TimerCardSkeleton } from "./TimerCardSkeleton";
 
 export function TimerList() {
   const searchParams = useSearchParams();
-  const tagFilter = searchParams.get('tag');
+  const tagFilter = searchParams.get("tag");
+  const { data: tag } = api.tags.getTagByHandle.useQuery(
+    {
+      handle: tagFilter ?? "",
+    },
+    {
+      enabled:
+        tagFilter !== null &&
+        tagFilter !== undefined &&
+        tagFilter != "" &&
+        tagFilter !== "all",
+    }
+  );
 
   const { data: timers, isLoading } = api.timer.getAllTimersByUserID.useQuery({
     showDone: false,
-    tag: tagFilter ?? undefined,
+    tagHandle: tagFilter ?? undefined,
   });
 
   const [loadDoneTimers, setLoadDoneTimers] = useState(false);
@@ -23,11 +35,11 @@ export function TimerList() {
     api.timer.getAllTimersByUserID.useQuery(
       {
         showDone: true,
-        tag: tagFilter ?? undefined,
+        tagHandle: tagFilter ?? undefined,
       },
       {
         enabled: loadDoneTimers, // Only run the query when loadDoneTimers is true
-      },
+      }
     );
 
   // TODO Prefetch? See page copy.tsx
@@ -49,10 +61,13 @@ export function TimerList() {
     );
   // TODO: Move up the toast to layout
   return (
-    <>
-      {tagFilter && (
-        <Flex justify="center" mb="4">
-          <Text>Filtering by tag: {tagFilter}</Text>
+    <Flex direction={"column"} gap={"4"}>
+      {tagFilter && tag && (
+        <Flex justify="center" align={"center"} gap={"2"}>
+          <Text className="text-neutral-300 text-sm">Tag:</Text>
+          <Badge size="2" color="indigo">
+            {tag.name}
+          </Badge>
         </Flex>
       )}
       <Flex gap={"3"} justify={"center"} wrap={"wrap"}>
@@ -60,6 +75,7 @@ export function TimerList() {
           <TimerCard
             key={timer.id}
             {...timer}
+            tags={timer.tags}
             showToast={showToast}
             updatedAt={timer.updatedAt}
           />
@@ -105,6 +121,6 @@ export function TimerList() {
         </Toast.Root>
         <Toast.Viewport className="[--viewport-padding:_25px] fixed bottom-0 right-0 flex flex-col p-[var(--viewport-padding)] gap-[10px] w-[390px] max-w-[100vw] m-0 list-none z-[2147483647] outline-none" />
       </Toast.Provider>
-    </>
+    </Flex>
   );
 }
