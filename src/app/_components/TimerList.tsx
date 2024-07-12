@@ -21,7 +21,7 @@ export function TimerList() {
       },
       {
         enabled: loadDoneTimers, // Only run the query when loadDoneTimers is true
-      }
+      },
     );
 
   // TODO Prefetch? See page copy.tsx
@@ -65,6 +65,12 @@ export function TimerList() {
         </Button>
       </Flex>
       <Flex gap={"3"} justify={"center"} wrap={"wrap"}>
+        {doneTimersLoading && (
+          <>
+            <TimerCardSkeleton />
+            <TimerCardSkeleton />
+          </>
+        )}
         {loadDoneTimers &&
           doneTimers?.map((timer) => (
             <TimerCard
