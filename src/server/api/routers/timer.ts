@@ -8,7 +8,12 @@ import {
 
 export const timerRouter = createTRPCRouter({
   createTimer: protectedProcedure
-    .input(z.object({ title: z.string().min(1), description: z.string(), date: z.date() }))
+    .input(z.object({ 
+      title: z.string().min(1), 
+      description: z.string(), 
+      date: z.date(),
+      tagId: z.string().optional()
+    }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.timer.create({
         data: {
@@ -16,15 +21,27 @@ export const timerRouter = createTRPCRouter({
           description: input.description,
           date: input.date,
           user: { connect: { id: ctx.session.user.id } },
+          tag: input.tagId ? { connect: { id: input.tagId } } : undefined,
         },
       });
     }),
   editTimer: protectedProcedure
-    .input(z.object({ id: z.string(), title: z.string().min(1), description: z.string(), date: z.date() }))
+    .input(z.object({ 
+      id: z.string(), 
+      title: z.string().min(1), 
+      description: z.string(), 
+      date: z.date(),
+      tagId: z.string().optional()
+    }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.timer.update({
         where: { id: input.id, user: { id: ctx.session.user.id } },
-        data: { title: input.title, description: input.description, date: input.date },
+        data: { 
+          title: input.title, 
+          description: input.description, 
+          date: input.date,
+          tag: input.tagId ? { connect: { id: input.tagId } } : { disconnect: true },
+        },
       });
     }),
   deleteTimer: protectedProcedure
