@@ -67,10 +67,17 @@ export const timerRouter = createTRPCRouter({
       });
     }),
   getAllTimersByUserID: protectedProcedure
-    .input(z.object({ showDone: z.boolean() }))
+    .input(z.object({ 
+      showDone: z.boolean(),
+      tagId: z.string().optional()
+    }))
     .query(({ ctx, input }) => {
       return ctx.db.timer.findMany({
-        where: { user: { id: ctx.session.user.id }, done: input.showDone === true ? true : false },
+        where: { 
+          user: { id: ctx.session.user.id }, 
+          done: input.showDone === true ? true : false,
+          ...(input.tagId && { tagId: input.tagId })
+        },
         orderBy:
           input.showDone ?
             {
@@ -78,6 +85,9 @@ export const timerRouter = createTRPCRouter({
             }
             :
             { date: "asc" },
+        include: {
+          tag: true
+        }
       });
     }),
 });
