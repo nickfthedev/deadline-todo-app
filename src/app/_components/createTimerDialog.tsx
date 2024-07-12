@@ -41,6 +41,7 @@ export function CreateTimerDialog() {
     onSuccess: async () => {
       setSuccessMessage("Timer created successfully");
       await utils.timer.getAllTimersByUserID.invalidate();
+      await utils.timer.getTimerByTimerID.invalidate();
       setTitle("");
       setDescription("");
       setDate(new Date().toISOString().split("T")[0]);

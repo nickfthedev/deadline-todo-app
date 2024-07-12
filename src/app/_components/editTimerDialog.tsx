@@ -62,6 +62,7 @@ export function EditTimerDialog({
   const editTimerMutation = api.timer.editTimer.useMutation({
     onSuccess: async () => {
       await utils.timer.getAllTimersByUserID.invalidate();
+      await utils.timer.getTimerByTimerID.invalidate();
       setSuccessMessage("Timer edited successfully");
     },
     onError: () => {

@@ -65,6 +65,7 @@ export const timerRouter = createTRPCRouter({
     .query(({ ctx, input }) => {
       return ctx.db.timer.findFirst({
         where: { id: input.id, user: { id: ctx.session.user.id } },
+        include: { tags: true }
       });
     }),
   getAllTimersByUserID: protectedProcedure

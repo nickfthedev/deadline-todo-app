@@ -8,6 +8,22 @@ import { Badge, Button, Flex, Text } from "@radix-ui/themes";
 import * as Toast from "@radix-ui/react-toast";
 import { CreateTimerDialog } from "./createTimerDialog";
 import { TimerCardSkeleton } from "./TimerCardSkeleton";
+import { LuCandyOff } from "react-icons/lu";
+
+function TimerListEmpty() {
+  return (
+    <Flex
+      gap={"3"}
+      justify={"center"}
+      wrap={"wrap"}
+      className="my-12"
+      align={"center"}
+    >
+      <LuCandyOff className=" text-3xl text-neutral-300" />
+      <Text className="text-neutral-300 text-2xl">No timers found</Text>
+    </Flex>
+  );
+}
 
 export function TimerList() {
   const searchParams = useSearchParams();
@@ -80,6 +96,7 @@ export function TimerList() {
             updatedAt={timer.updatedAt}
           />
         ))}
+        {timers?.length === 0 && <TimerListEmpty />}
       </Flex>
       <Flex justify={"center"} mt={"4"} gap={"4"}>
         <CreateTimerDialog />
@@ -108,6 +125,7 @@ export function TimerList() {
               updatedAt={timer.updatedAt}
             />
           ))}
+        {loadDoneTimers && doneTimers?.length === 0 && <TimerListEmpty />}
       </Flex>
       <Toast.Provider swipeDirection="right">
         <Toast.Root
