@@ -1,16 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from 'next/navigation';
 import { api } from "~/trpc/react";
 import { TimerCard } from "./TimerCard";
-import { Button, Flex } from "@radix-ui/themes";
+import { Button, Flex, Text } from "@radix-ui/themes";
 import * as Toast from "@radix-ui/react-toast";
 import { CreateTimerDialog } from "./createTimerDialog";
 import { TimerCardSkeleton } from "./TimerCardSkeleton";
 
 export function TimerList() {
+  const searchParams = useSearchParams();
+  const tagFilter = searchParams.get('tag');
+
   const { data: timers, isLoading } = api.timer.getAllTimersByUserID.useQuery({
     showDone: false,
+    tag: tagFilter ?? undefined,
   });
 
   const [loadDoneTimers, setLoadDoneTimers] = useState(false);
@@ -18,6 +23,7 @@ export function TimerList() {
     api.timer.getAllTimersByUserID.useQuery(
       {
         showDone: true,
+        tag: tagFilter ?? undefined,
       },
       {
         enabled: loadDoneTimers, // Only run the query when loadDoneTimers is true
@@ -44,6 +50,11 @@ export function TimerList() {
   // TODO: Move up the toast to layout
   return (
     <>
+      {tagFilter && (
+        <Flex justify="center" mb="4">
+          <Text>Filtering by tag: {tagFilter}</Text>
+        </Flex>
+      )}
       <Flex gap={"3"} justify={"center"} wrap={"wrap"}>
         {timers?.map((timer) => (
           <TimerCard
