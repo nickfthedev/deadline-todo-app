@@ -9,11 +9,12 @@ import {
   DropdownMenu,
   Flex,
   Heading,
+  IconButton,
   Text,
 } from "@radix-ui/themes";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FiMoreHorizontal } from "react-icons/fi";
+import { FiMoreHorizontal, FiArrowLeft } from "react-icons/fi";
 import { EditTimerDialog } from "~/app/_components/editTimerDialog";
 import { ToastComponent } from "~/app/_components/toast";
 import { api } from "~/trpc/react";
@@ -147,7 +148,7 @@ export default function TimerDetails() {
     seconds = Math.floor((updatedAbsDelta % (1000 * 60)) / 1000);
   }
   return (
-    <Card className="bg-base-300">
+    <Flex direction={"column"} gap={"4"} mt={"6"} mx={"6"}>
       <ToastComponent
         toastOpen={toastOpen}
         setToastOpen={setToastOpen}
@@ -159,15 +160,14 @@ export default function TimerDetails() {
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
       />
+      <Flex direction={"row"} justify={"between"}>
+        <IconButton variant="ghost">
+          <FiArrowLeft size={"20"} color="gray" />
+        </IconButton>
 
-      <Flex justify={"between"}>
-        <Flex gap={"1"} direction={"row"}>
-          {timer.tags.map((tag) => (
-            <Badge key={tag.id} size="1" color="indigo">
-              {tag.name}
-            </Badge>
-          ))}
-        </Flex>
+        <Heading as="h2" size={"6"}>
+          {timer.title}
+        </Heading>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
             <Button variant="ghost">
@@ -197,24 +197,34 @@ export default function TimerDetails() {
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </Flex>
-      <Flex
-        direction={"column"}
-        className="w-[350px] h-[150px] justify-center items-center"
-      >
-        <Heading as="h4" size={"4"}>
-          {timer.title}
-        </Heading>
+      <Flex justify={"center"}>
+        <Flex gap={"1"} direction={"row"}>
+          {timer.tags.map((tag) => (
+            <Badge key={tag.id} size="1" color="indigo">
+              {tag.name}
+            </Badge>
+          ))}
+        </Flex>
+      </Flex>
+      <Flex justify={"center"}>
         <Text as="p">{timer.description}</Text>
-        <Text
-          size={"7"}
-          weight={"bold"}
-          className={`font-monospace ${
-            !timer.done && isNegative
-              ? "text-error"
-              : !timer.done && days === 0 && weeks === 0 && years === 0
-              ? "text-warning"
-              : "text-neutral-100"
-          } 
+      </Flex>
+      <Flex justify={"center"}>
+        <Card className="bg-base-300" mt={"4"}>
+          <Flex
+            direction={"column"}
+            className="w-[550px] h-[250px] justify-center items-center"
+          >
+            <Text
+              size={"7"}
+              weight={"bold"}
+              className={`font-monospace ${
+                !timer.done && isNegative
+                  ? "text-error"
+                  : !timer.done && days === 0 && weeks === 0 && years === 0
+                  ? "text-warning"
+                  : "text-neutral-100"
+              } 
           ${
             timer.done &&
             !isNegative &&
@@ -232,54 +242,60 @@ export default function TimerDetails() {
           }
           ${timer.done && isNegative && " text-green-500"}
           `}
-        >
-          {isNegative && "-"}
-          {years > 0 && <Text>{years}Y:</Text>}
-          {weeks > 0 && <Text>{weeks}W:</Text>}
-          {days > 0 && <Text>{days}D:</Text>}
-          <Text>{hours.toString().padStart(2, "0")}H:</Text>
-          <Text>{minutes.toString().padStart(2, "0")}M:</Text>
-          <Text>{seconds.toString().padStart(2, "0")}S</Text>
-        </Text>
-        <Flex direction={"column"}>
-          <Text size={"1"} className="opacity-50 font-semibold">
-            Due: {timer.date.toLocaleDateString()} at{" "}
-            {timer.date.toLocaleTimeString()}
-          </Text>
-          {timer.done && (
-            <Text size={"1"} className="opacity-50 font-semibold">
-              Done: {timer.updatedAt?.toLocaleDateString()} at{" "}
-              {timer.updatedAt?.toLocaleTimeString()}
+            >
+              {isNegative && "-"}
+              {years > 0 && <Text>{years}Y:</Text>}
+              {weeks > 0 && <Text>{weeks}W:</Text>}
+              {days > 0 && <Text>{days}D:</Text>}
+              <Text>{hours.toString().padStart(2, "0")}H:</Text>
+              <Text>{minutes.toString().padStart(2, "0")}M:</Text>
+              <Text>{seconds.toString().padStart(2, "0")}S</Text>
             </Text>
-          )}
-        </Flex>
-      </Flex>
-
-      <AlertDialog.Root
-        open={isDeleteDialogOpen}
-        onOpenChange={handleCloseDeleteDialog}
-      >
-        <AlertDialog.Content maxWidth="450px">
-          <AlertDialog.Title>Delete Tag</AlertDialog.Title>
-          <AlertDialog.Description size="2">
-            Are you sure? This tag will be deleted and any timers associated
-            with it will be untagged.
-          </AlertDialog.Description>
-
-          <Flex gap="3" mt="4" justify="end">
-            <AlertDialog.Cancel>
-              <Button variant="soft" color="gray">
-                Cancel
-              </Button>
-            </AlertDialog.Cancel>
-            <AlertDialog.Action>
-              <Button variant="solid" color="red" onClick={handleDeleteTimer}>
-                Delete Tag
-              </Button>
-            </AlertDialog.Action>
+            <Flex direction={"column"}>
+              <Text size={"1"} className="opacity-50 font-semibold">
+                Due: {timer.date.toLocaleDateString()} at{" "}
+                {timer.date.toLocaleTimeString()}
+              </Text>
+              {timer.done && (
+                <Text size={"1"} className="opacity-50 font-semibold">
+                  Done: {timer.updatedAt?.toLocaleDateString()} at{" "}
+                  {timer.updatedAt?.toLocaleTimeString()}
+                </Text>
+              )}
+            </Flex>
           </Flex>
-        </AlertDialog.Content>
-      </AlertDialog.Root>
-    </Card>
+
+          <AlertDialog.Root
+            open={isDeleteDialogOpen}
+            onOpenChange={handleCloseDeleteDialog}
+          >
+            <AlertDialog.Content maxWidth="450px">
+              <AlertDialog.Title>Delete Tag</AlertDialog.Title>
+              <AlertDialog.Description size="2">
+                Are you sure? This tag will be deleted and any timers associated
+                with it will be untagged.
+              </AlertDialog.Description>
+
+              <Flex gap="3" mt="4" justify="end">
+                <AlertDialog.Cancel>
+                  <Button variant="soft" color="gray">
+                    Cancel
+                  </Button>
+                </AlertDialog.Cancel>
+                <AlertDialog.Action>
+                  <Button
+                    variant="solid"
+                    color="red"
+                    onClick={handleDeleteTimer}
+                  >
+                    Delete Tag
+                  </Button>
+                </AlertDialog.Action>
+              </Flex>
+            </AlertDialog.Content>
+          </AlertDialog.Root>
+        </Card>
+      </Flex>
+    </Flex>
   );
 }
