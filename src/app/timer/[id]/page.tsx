@@ -13,6 +13,7 @@ import {
   Text,
 } from "@radix-ui/themes";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiMoreHorizontal, FiArrowLeft } from "react-icons/fi";
 import { EditTimerDialog } from "~/app/_components/editTimerDialog";
@@ -27,6 +28,7 @@ export default function TimerDetails() {
   });
 
   const utils = api.useUtils();
+  const router = useRouter();
 
   // Toast handling
   const [toastOpen, setToastOpen] = useState(false);
@@ -161,7 +163,7 @@ export default function TimerDetails() {
         onClose={handleCloseDialog}
       />
       <Flex direction={"row"} justify={"between"}>
-        <IconButton variant="ghost">
+        <IconButton variant="ghost" onClick={() => router.back()}>
           <FiArrowLeft size={"20"} color="gray" />
         </IconButton>
 
@@ -207,16 +209,13 @@ export default function TimerDetails() {
         </Flex>
       </Flex>
       <Flex justify={"center"}>
-        <Text as="p">{timer.description}</Text>
-      </Flex>
-      <Flex justify={"center"}>
         <Card className="bg-base-300" mt={"4"}>
           <Flex
             direction={"column"}
-            className="w-[550px] h-[250px] justify-center items-center"
+            className="w-[550px] h-[150px] justify-center items-center"
           >
             <Text
-              size={"7"}
+              size={"9"}
               weight={"bold"}
               className={`font-monospace ${
                 !timer.done && isNegative
@@ -264,38 +263,37 @@ export default function TimerDetails() {
               )}
             </Flex>
           </Flex>
-
-          <AlertDialog.Root
-            open={isDeleteDialogOpen}
-            onOpenChange={handleCloseDeleteDialog}
-          >
-            <AlertDialog.Content maxWidth="450px">
-              <AlertDialog.Title>Delete Tag</AlertDialog.Title>
-              <AlertDialog.Description size="2">
-                Are you sure? This tag will be deleted and any timers associated
-                with it will be untagged.
-              </AlertDialog.Description>
-
-              <Flex gap="3" mt="4" justify="end">
-                <AlertDialog.Cancel>
-                  <Button variant="soft" color="gray">
-                    Cancel
-                  </Button>
-                </AlertDialog.Cancel>
-                <AlertDialog.Action>
-                  <Button
-                    variant="solid"
-                    color="red"
-                    onClick={handleDeleteTimer}
-                  >
-                    Delete Tag
-                  </Button>
-                </AlertDialog.Action>
-              </Flex>
-            </AlertDialog.Content>
-          </AlertDialog.Root>
         </Card>
       </Flex>
+      <Flex justify={"center"}>
+        <Text as="p">{timer.description}</Text>
+      </Flex>
+
+      <AlertDialog.Root
+        open={isDeleteDialogOpen}
+        onOpenChange={handleCloseDeleteDialog}
+      >
+        <AlertDialog.Content maxWidth="450px">
+          <AlertDialog.Title>Delete Tag</AlertDialog.Title>
+          <AlertDialog.Description size="2">
+            Are you sure? This tag will be deleted and any timers associated
+            with it will be untagged.
+          </AlertDialog.Description>
+
+          <Flex gap="3" mt="4" justify="end">
+            <AlertDialog.Cancel>
+              <Button variant="soft" color="gray">
+                Cancel
+              </Button>
+            </AlertDialog.Cancel>
+            <AlertDialog.Action>
+              <Button variant="solid" color="red" onClick={handleDeleteTimer}>
+                Delete Tag
+              </Button>
+            </AlertDialog.Action>
+          </Flex>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
     </Flex>
   );
 }
