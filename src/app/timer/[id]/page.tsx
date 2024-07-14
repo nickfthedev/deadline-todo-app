@@ -16,6 +16,7 @@ import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiMoreHorizontal, FiArrowLeft } from "react-icons/fi";
+import Editor from "~/app/_components/Editor";
 import { EditTimerDialog } from "~/app/_components/editTimerDialog";
 import { ToastComponent } from "~/app/_components/toast";
 import { api } from "~/trpc/react";
@@ -29,6 +30,9 @@ export default function TimerDetails() {
 
   const utils = api.useUtils();
   const router = useRouter();
+
+  // Form Control
+  const [description, setDescription] = useState("");
 
   // Toast handling
   const [toastOpen, setToastOpen] = useState(false);
@@ -101,6 +105,10 @@ export default function TimerDetails() {
       setIsClient(true);
     }, []);
   }
+
+  useEffect(() => {
+    setDescription(timer?.description || "");
+  }, [timer]);
 
   // Return early if loading
   if (isLoading) {
@@ -215,15 +223,14 @@ export default function TimerDetails() {
             className="w-[550px] h-[150px] justify-center items-center"
           >
             <Text
-              size={"9"}
               weight={"bold"}
-              className={`font-monospace ${
+              className={`text-5xl font-monospace ${
                 !timer.done && isNegative
                   ? "text-error"
                   : !timer.done && days === 0 && weeks === 0 && years === 0
                   ? "text-warning"
                   : "text-neutral-100"
-              } 
+              }
           ${
             timer.done &&
             !isNegative &&
@@ -266,7 +273,7 @@ export default function TimerDetails() {
         </Card>
       </Flex>
       <Flex justify={"center"}>
-        <Text as="p">{timer.description}</Text>
+        <Editor />
       </Flex>
 
       <AlertDialog.Root

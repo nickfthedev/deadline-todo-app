@@ -114,7 +114,7 @@ export function TimerCard({
           className="w-[350px] h-[150px] justify-center items-center"
         >
           <Heading as="h4" size={"4"}>
-            {title}
+            {title.length > 40 ? `${title.slice(0, 40)}...` : title}
           </Heading>
           <Text as="p">{description}</Text>
           <Text size={"7"} weight={"bold"} className="font-monospace">
@@ -213,9 +213,15 @@ export function TimerCard({
         className="w-[350px] h-[150px] justify-center items-center"
       >
         <Heading as="h4" size={"4"}>
-          <Link href={`/timer/${id}`}>{title}</Link>
+          <Link href={`/timer/${id}`}>
+            {title.length > 40 ? `${title.slice(0, 40)}...` : title}
+          </Link>
         </Heading>
-        <Text as="p">{description}</Text>
+        <Text as="p" className="text-sm">
+          {description?.length > 50
+            ? `${description.slice(0, 50)}...`
+            : description?.split("\n")[0]?.slice(0, 50) ?? description ?? ""}
+        </Text>
         <Text
           size={"7"}
           weight={"bold"}
