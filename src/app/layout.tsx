@@ -37,7 +37,7 @@ export default async function RootLayout({
                     </Flex>
                   </Flex>
 
-                  <Separator size="4" className="bg-base-300" />
+                  <Separator size="4" className="bg-base-300 mt-5" />
                   <Footer />
                 </Flex>
               </Theme>

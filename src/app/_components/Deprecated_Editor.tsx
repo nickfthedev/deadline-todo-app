@@ -7,7 +7,7 @@ import Link from "@yoopta/link";
 // import Callout from '@yoopta/callout';
 // import Video from '@yoopta/video';
 // import File from '@yoopta/file';
-import Accordion from "@yoopta/accordion";
+// import Accordion from "@yoopta/accordion";
 import { NumberedList, BulletedList, TodoList } from "@yoopta/lists";
 import {
   Bold,
@@ -20,7 +20,7 @@ import {
 import { HeadingOne, HeadingThree, HeadingTwo } from "@yoopta/headings";
 import Code from "@yoopta/code";
 import { useMemo, useRef } from "react";
-import type { YooptaPlugin } from "@yoopta/editor";
+import type { YooEditor, YooptaPlugin } from "@yoopta/editor";
 import ActionMenuList, {
   DefaultActionMenuRender,
 } from "@yoopta/action-menu-list";
@@ -29,7 +29,7 @@ import LinkTool, { DefaultLinkToolRender } from "@yoopta/link-tool";
 
 const plugins = [
   Paragraph,
-  Accordion,
+  // Accordion,
   HeadingOne,
   HeadingTwo,
   HeadingThree,
@@ -100,14 +100,18 @@ const TOOLS = {
 
 const MARKS = [Bold, Italic, CodeMark, Underline, Strike, Highlight];
 
-export default function Editor() {
-  const editor = useMemo(() => createYooptaEditor(), []);
+interface EditorProps {
+  setEditorInstance: YooEditor;
+}
+
+export default function Editor({ setEditorInstance }: EditorProps) {
+  // const editor = useMemo(() => createYooptaEditor(), []);
   const selectionRef = useRef(null);
 
   return (
     <div ref={selectionRef}>
       <YooptaEditor
-        editor={editor}
+        editor={setEditorInstance}
         plugins={plugins}
         tools={TOOLS}
         marks={MARKS}

@@ -9,8 +9,10 @@ import {
   TextField,
   Callout,
   DropdownMenu,
+  Box,
+  TextArea,
 } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { api } from "~/trpc/react";
 
 export function CreateTimerDialog() {
@@ -36,6 +38,20 @@ export function CreateTimerDialog() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [checkedTags, setCheckedTags] = useState<string[]>([]);
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [description]);
 
   const createTimerMutation = api.timer.createTimer.useMutation({
     onSuccess: async () => {
@@ -120,11 +136,23 @@ export function CreateTimerDialog() {
             <Text as="div" size="2" mb="1" weight="bold">
               Description
             </Text>
-            <TextField.Root
-              placeholder="Enter the timer description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
+            <Box className="border border-base-300 rounded-lg">
+              <TextArea
+                ref={textareaRef}
+                placeholder="Enter the timer description"
+                value={description}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  adjustTextareaHeight();
+                }}
+                style={{
+                  whiteSpace: "pre-wrap",
+                  overflow: "hidden",
+                  resize: "none",
+                  minHeight: "100px",
+                }}
+              />
+            </Box>
           </label>
           <label>
             <Text as="div" size="2" mb="1" weight="bold">

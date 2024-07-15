@@ -159,7 +159,7 @@ export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
         </IconButton>
         <Heading size="5">
           <Link href={"/"} className="text-neutral-200">
-            Header
+            DueDo
           </Link>
         </Heading>
       </Flex>
@@ -205,7 +205,7 @@ export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
               <Flex justify={"center"} mb={"4"} className=" text-center">
                 <Heading size="5" align={"center"}>
                   <Link href={"/"} className="text-neutral-200 text-center">
-                    Header
+                    DueDo
                   </Link>
                 </Heading>
               </Flex>

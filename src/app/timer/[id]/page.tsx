@@ -11,15 +11,35 @@ import {
   Heading,
   IconButton,
   Text,
+  TextArea,
+  TextField,
 } from "@radix-ui/themes";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { FiMoreHorizontal, FiArrowLeft } from "react-icons/fi";
-import Editor from "~/app/_components/Editor";
+import { useEffect, useMemo, useState, useRef } from "react";
+import {
+  FiMoreHorizontal,
+  FiArrowLeft,
+  FiTrash,
+  FiSave,
+  FiCheckCircle,
+  FiCircle,
+} from "react-icons/fi";
 import { EditTimerDialog } from "~/app/_components/editTimerDialog";
 import { ToastComponent } from "~/app/_components/toast";
 import { api } from "~/trpc/react";
+
+interface Timer {
+  id: string;
+  title: string;
+  description: string;
+  date: Date;
+}
+
+interface Tag {
+  id: string;
+  name: string;
+}
 
 export default function TimerDetails() {
   // Data fetching
@@ -30,9 +50,6 @@ export default function TimerDetails() {
 
   const utils = api.useUtils();
   const router = useRouter();
-
-  // Form Control
-  const [description, setDescription] = useState("");
 
   // Toast handling
   const [toastOpen, setToastOpen] = useState(false);
@@ -60,6 +77,7 @@ export default function TimerDetails() {
       utils.timer.getAllTimersByUserID.invalidate();
       utils.timer.getTimerByTimerID.invalidate();
       showToast("Timer deleted successfully");
+      router.push("/timer");
     },
   });
 
@@ -91,6 +109,62 @@ export default function TimerDetails() {
     mutateMarkAsUndone.mutate({ id: timer?.id || "" });
   };
 
+  // Form Control
+  const editTimerMutation = api.timer.editTimer.useMutation({
+    onSuccess: async () => {
+      await utils.timer.getAllTimersByUserID.invalidate();
+      await utils.timer.getTimerByTimerID.invalidate();
+      showToast("Timer edited successfully");
+    },
+    onError: () => {
+      showToast("There was an error editing the timer");
+    },
+  });
+  const [title, setTitle] = useState(timer?.title || "");
+  const [description, setDescription] = useState(timer?.description || "");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState(
+    timer?.date.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }) || ""
+  );
+  //Handle Tag List
+  const [tagsOpen, setTagsOpen] = useState(false);
+  const { data: tagList, isLoading: tagsLoading } =
+    api.tags.getAllTagsByUserID.useQuery(undefined, {
+      enabled: tagsOpen,
+    });
+  const [checkedTags, setCheckedTags] = useState<string[]>(
+    timer?.tags.map((tag) => tag.id) || []
+  );
+  const handleSave = () => {
+    editTimerMutation.mutate({
+      id: timer?.id || "",
+      title,
+      description: description.replace(/"/g, ""),
+      date: new Date(date + "T" + time),
+      tagId: checkedTags,
+    });
+  };
+
+  useEffect(() => {
+    setTitle(timer?.title || "");
+    setDescription(timer?.description || "");
+    // Format the date correctly
+    if (timer?.date) {
+      const formattedDate = timer.date.toISOString().split("T")[0] ?? "";
+      setDate(formattedDate);
+    }
+    setTime(
+      timer?.date.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }) || ""
+    );
+    setCheckedTags(timer?.tags.map((tag) => tag.id) || []);
+  }, [timer]);
+
   if (!timer?.done) {
     useEffect(() => {
       setIsClient(true);
@@ -106,9 +180,18 @@ export default function TimerDetails() {
     }, []);
   }
 
+  // Auto grow textarea
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
   useEffect(() => {
-    setDescription(timer?.description || "");
-  }, [timer]);
+    adjustTextareaHeight();
+  }, [description]);
 
   // Return early if loading
   if (isLoading) {
@@ -157,6 +240,7 @@ export default function TimerDetails() {
     minutes = Math.floor((updatedAbsDelta % (1000 * 60 * 60)) / (1000 * 60));
     seconds = Math.floor((updatedAbsDelta % (1000 * 60)) / 1000);
   }
+
   return (
     <Flex direction={"column"} gap={"4"} mt={"6"} mx={"6"}>
       <ToastComponent
@@ -170,14 +254,17 @@ export default function TimerDetails() {
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
       />
-      <Flex direction={"row"} justify={"between"}>
+      <Flex direction={"row"} justify={"between"} align={"center"}>
         <IconButton variant="ghost" onClick={() => router.back()}>
           <FiArrowLeft size={"20"} color="gray" />
         </IconButton>
 
-        <Heading as="h2" size={"6"}>
-          {timer.title}
-        </Heading>
+        <input
+          className="text-3xl font-semibold tracking-tight h-fit text-center rounded-2xl p-2"
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
             <Button variant="ghost">
@@ -209,11 +296,43 @@ export default function TimerDetails() {
       </Flex>
       <Flex justify={"center"}>
         <Flex gap={"1"} direction={"row"}>
-          {timer.tags.map((tag) => (
-            <Badge key={tag.id} size="1" color="indigo">
-              {tag.name}
-            </Badge>
-          ))}
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+              <Button variant="ghost">
+                {tagList
+                  ?.filter((tag) => checkedTags.includes(tag.id))
+                  .map((tag) => (
+                    <Badge key={tag.id} size="1" color="indigo">
+                      {tag.name}
+                    </Badge>
+                  ))}
+                {(tagList?.filter((tag) => checkedTags.includes(tag.id))
+                  ?.length ?? 0) <= 0 && (
+                  <Badge size="1" color="gray">
+                    Click to add a tag
+                  </Badge>
+                )}
+              </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              {tagList?.map((tag) => (
+                <DropdownMenu.CheckboxItem
+                  key={tag.id}
+                  checked={checkedTags.includes(tag.id)}
+                  onSelect={(e) => e.preventDefault()}
+                  onCheckedChange={(e) => {
+                    setCheckedTags(
+                      e
+                        ? [...checkedTags, tag.id]
+                        : checkedTags.filter((id) => id !== tag.id)
+                    );
+                  }}
+                >
+                  {tag.name}
+                </DropdownMenu.CheckboxItem>
+              ))}
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
         </Flex>
       </Flex>
       <Flex justify={"center"}>
@@ -272,10 +391,83 @@ export default function TimerDetails() {
           </Flex>
         </Card>
       </Flex>
-      <Flex justify={"center"}>
-        <Editor />
+      <Flex justify={"center"} direction={"column"} className="mt-2 gap-2">
+        <Flex direction={"row"} justify={"center"} gap={"2"}>
+          <label>
+            <Text as="div" size="2" mb="1">
+              Date
+            </Text>
+            <TextField.Root
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+            {editTimerMutation.error?.data?.zodError?.fieldErrors.date && (
+              <Text color="red">
+                {editTimerMutation.error.data.zodError.fieldErrors.date}
+              </Text>
+            )}
+          </label>
+          <label>
+            <Text as="div" size="2" mb="1">
+              Time
+            </Text>
+            <TextField.Root
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+            />
+            {editTimerMutation.error?.data?.zodError?.fieldErrors.time && (
+              <Text color="red">
+                {editTimerMutation.error.data.zodError.fieldErrors.time}
+              </Text>
+            )}
+          </label>
+        </Flex>
+        <Heading className="text-xl text-center font-semibold tracking-tight">
+          Description
+        </Heading>
+        <Box className="border border-base-300 rounded-lg">
+          <TextArea
+            ref={textareaRef}
+            value={description}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              adjustTextareaHeight();
+            }}
+            style={{
+              whiteSpace: "pre-wrap",
+              overflow: "hidden",
+              resize: "none",
+              minHeight: "100px",
+            }}
+          />
+        </Box>
       </Flex>
-
+      <Flex justify={"between"} gap={"2"}>
+        <Flex direction={"row"} gap={"2"}>
+          <Button onClick={handleSave}>
+            <FiSave />
+            Save
+          </Button>
+          {!timer.done && (
+            <Button variant="soft" onClick={handleMarkAsDone}>
+              <FiCheckCircle />
+              Mark as Done
+            </Button>
+          )}
+          {timer.done && (
+            <Button variant="soft" onClick={handleMarkAsUndone}>
+              <FiCircle />
+              Mark as Undone
+            </Button>
+          )}
+        </Flex>
+        <Button variant="soft" color="red" onClick={handleOpenDeleteDialog}>
+          <FiTrash />
+          Delete
+        </Button>
+      </Flex>
       <AlertDialog.Root
         open={isDeleteDialogOpen}
         onOpenChange={handleCloseDeleteDialog}

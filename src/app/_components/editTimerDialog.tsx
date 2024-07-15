@@ -8,14 +8,16 @@ import {
   TextField,
   Callout,
   DropdownMenu,
+  TextArea,
+  Box,
 } from "@radix-ui/themes";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { api } from "~/trpc/react";
 
 interface Timer {
   id: string;
   title: string;
-  description: string;
+  description: any;
   date: Date;
 }
 
@@ -79,6 +81,21 @@ export function EditTimerDialog({
       tagId: checkedTags,
     });
   };
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [description]);
+
   return (
     <Dialog.Root
       open={isOpen}
@@ -128,11 +145,23 @@ export function EditTimerDialog({
             <Text as="div" size="2" mb="1" weight="bold">
               Description
             </Text>
-            <TextField.Root
-              placeholder="Enter the timer description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
+            <Box className="border border-base-300 rounded-lg">
+              <TextArea
+                ref={textareaRef}
+                placeholder="Enter the timer description"
+                value={description}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  adjustTextareaHeight();
+                }}
+                style={{
+                  whiteSpace: "pre-wrap",
+                  overflow: "hidden",
+                  resize: "none",
+                  minHeight: "100px",
+                }}
+              />
+            </Box>
           </label>
           <label>
             <Text as="div" size="2" mb="1" weight="bold">

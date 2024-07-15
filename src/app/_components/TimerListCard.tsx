@@ -33,7 +33,7 @@ interface TimerCardProps {
   showToast: (message: string) => void;
 }
 
-export function TimerCard({
+export function TimerListCard({
   id,
   title,
   description,
@@ -163,7 +163,7 @@ export function TimerCard({
   }
 
   return (
-    <Card className="bg-base-300">
+    <Card className="bg-base-300 w-full p-4">
       <EditTimerDialog
         timer={{ id, title, description, date }}
         tags={tags}
@@ -171,67 +171,42 @@ export function TimerCard({
         onClose={handleCloseDialog}
       />
 
-      <Flex justify={"between"}>
-        <Flex gap={"1"} direction={"row"}>
-          {tags.map((tag) => (
-            <Badge key={tag.id} size="1" color="indigo">
-              {tag.name}
-            </Badge>
-          ))}
-        </Flex>
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger>
-            <Button variant="ghost">
-              <FiMoreHorizontal size={"20"} color="gray" />
-            </Button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content>
-            {!doneMode && (
-              <DropdownMenu.Item onSelect={handleOpenDialog}>
-                Edit
-              </DropdownMenu.Item>
-            )}
-            {!doneMode && (
-              <DropdownMenu.Item onSelect={handleMarkAsDone}>
-                Mark as Done
-              </DropdownMenu.Item>
-            )}
-            {doneMode && (
-              <DropdownMenu.Item onSelect={handleMarkAsUndone}>
-                Mark as Undone
-              </DropdownMenu.Item>
-            )}
-            <DropdownMenu.Separator />
-            <DropdownMenu.Item color="red" onSelect={handleOpenDeleteDialog}>
-              Delete
-            </DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
-      </Flex>
       <Flex
-        direction={"column"}
-        className="w-[350px] h-[150px] justify-center items-center"
+        direction={"row"}
+        justify={"between"}
+        className="w-full h-[75px]"
+        gap={"2"}
       >
-        <Heading as="h4" size={"4"}>
-          <Link href={`/timer/${id}`}>
-            {title.length > 40 ? `${title.slice(0, 40)}...` : title}
-          </Link>
-        </Heading>
-        <Text as="p" className="text-sm">
-          {description?.length > 50
-            ? `${description.slice(0, 50)}...`
-            : description?.split("\n")[0]?.slice(0, 50) ?? description ?? ""}
-        </Text>
-        <Text
-          size={"7"}
-          weight={"bold"}
-          className={`font-monospace ${
-            !doneMode && isNegative
-              ? "text-error"
-              : !doneMode && days === 0 && weeks === 0 && years === 0
-              ? "text-warning"
-              : "text-neutral-100"
-          }
+        <Flex direction={"column"} gap={"2"} className=" w-7/12">
+          <Flex gap={"1"} direction={"row"}>
+            {tags.map((tag) => (
+              <Badge key={tag.id} size="1" color="indigo">
+                {tag.name}
+              </Badge>
+            ))}
+          </Flex>
+          <Heading as="h4" size={"4"}>
+            <Link href={`/timer/${id}`}>
+              {title.length > 40 ? `${title.slice(0, 40)}...` : title}
+            </Link>
+          </Heading>
+          <Text as="p" className="text-sm">
+            {description?.length > 50
+              ? `${description.slice(0, 50)}...`
+              : description?.split("\n")[0]?.slice(0, 50) ?? description ?? ""}
+          </Text>
+        </Flex>
+        <Flex direction={"column"} gap={"2"} align={"start"} className="w-5/12">
+          <Text
+            size={"6"}
+            weight={"bold"}
+            className={` rounded-xl bg-base-300 p-2 font-monospace ${
+              !doneMode && isNegative
+                ? "text-error"
+                : !doneMode && days === 0 && weeks === 0 && years === 0
+                ? "text-warning"
+                : "text-neutral-100"
+            }
           ${
             doneMode &&
             !isNegative &&
@@ -249,25 +224,56 @@ export function TimerCard({
           }
           ${doneMode && isNegative && " text-green-500"}
           `}
-        >
-          {isNegative && "-"}
-          {years > 0 && <Text>{years}Y:</Text>}
-          {weeks > 0 && <Text>{weeks}W:</Text>}
-          {days > 0 && <Text>{days}D:</Text>}
-          <Text>{hours.toString().padStart(2, "0")}H:</Text>
-          <Text>{minutes.toString().padStart(2, "0")}M:</Text>
-          <Text>{seconds.toString().padStart(2, "0")}S</Text>
-        </Text>
-        <Flex direction={"column"}>
-          <Text size={"1"} className="opacity-50 font-semibold">
-            Due: {date.toLocaleDateString()} at {date.toLocaleTimeString()}
+          >
+            {isNegative && "-"}
+            {years > 0 && <Text>{years}Y:</Text>}
+            {weeks > 0 && <Text>{weeks}W:</Text>}
+            {days > 0 && <Text>{days}D:</Text>}
+            <Text>{hours.toString().padStart(2, "0")}H:</Text>
+            <Text>{minutes.toString().padStart(2, "0")}M:</Text>
+            <Text>{seconds.toString().padStart(2, "0")}S</Text>
           </Text>
-          {doneMode && (
+          <Flex direction={"column"}>
             <Text size={"1"} className="opacity-50 font-semibold">
-              Done: {updatedAt?.toLocaleDateString()} at{" "}
-              {updatedAt?.toLocaleTimeString()}
+              Due: {date.toLocaleDateString()} at {date.toLocaleTimeString()}
             </Text>
-          )}
+            {doneMode && (
+              <Text size={"1"} className="opacity-50 font-semibold">
+                Done: {updatedAt?.toLocaleDateString()} at{" "}
+                {updatedAt?.toLocaleTimeString()}
+              </Text>
+            )}
+          </Flex>
+        </Flex>
+        <Flex justify={"end"}>
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+              <Button variant="ghost">
+                <FiMoreHorizontal size={"20"} color="gray" />
+              </Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              {!doneMode && (
+                <DropdownMenu.Item onSelect={handleOpenDialog}>
+                  Edit
+                </DropdownMenu.Item>
+              )}
+              {!doneMode && (
+                <DropdownMenu.Item onSelect={handleMarkAsDone}>
+                  Mark as Done
+                </DropdownMenu.Item>
+              )}
+              {doneMode && (
+                <DropdownMenu.Item onSelect={handleMarkAsUndone}>
+                  Mark as Undone
+                </DropdownMenu.Item>
+              )}
+              <DropdownMenu.Separator />
+              <DropdownMenu.Item color="red" onSelect={handleOpenDeleteDialog}>
+                Delete
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
         </Flex>
       </Flex>
 
