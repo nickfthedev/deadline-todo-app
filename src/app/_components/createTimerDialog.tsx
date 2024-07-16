@@ -1,6 +1,5 @@
 "use client";
 
-import { Tags } from "@prisma/client";
 import {
   Dialog,
   Button,
@@ -20,10 +19,9 @@ export function CreateTimerDialog() {
 
   //Handle Tag List
   const [isOpen, setIsOpen] = useState(false);
-  const { data: tagList, isLoading: tagsLoading } =
-    api.tags.getAllTagsByUserID.useQuery(undefined, {
-      enabled: isOpen,
-    });
+  const { data: tagList } = api.tags.getAllTagsByUserID.useQuery(undefined, {
+    enabled: isOpen,
+  });
 
   //Handle Input
   const [title, setTitle] = useState("");

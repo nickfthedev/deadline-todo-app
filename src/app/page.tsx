@@ -1,12 +1,8 @@
-import { getServerAuthSession } from "~/server/auth";
 import { Box, Flex, Heading, Text, Button } from "@radix-ui/themes";
 import CountdownTimer from "~/app/_components/CountDownTimer";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 
 export default async function Home() {
-  const session = await getServerAuthSession();
-
   return (
     <Flex direction="column" className="min-h-screen">
       <Box className="container mx-auto px-4 py-12">
@@ -26,7 +22,7 @@ export default async function Home() {
               size="4"
               className="mt-8 bg-secondary hover:bg-accent text-white px-8 py-2 rounded-full transition duration-300"
             >
-              Get Started Now (it's free)
+              Get Started Now (it&apos;s free)
             </Button>
           </Link>
         </Flex>
@@ -39,8 +35,9 @@ export default async function Home() {
               Free
             </Heading>
             <Text className="text-gray-600">
-              I've built this for my personal use and I'm sharing it with you.
-              It's free to use. Maybe there will be paid features in the future.
+              I&#39;ve built this for my personal use and I&#39;m sharing it
+              with you. It&#39;s free to use. Maybe there will be paid features
+              in the future.
             </Text>
           </Box>
           <Box className="text-center">
@@ -57,9 +54,9 @@ export default async function Home() {
               Productive
             </Heading>
             <Text className="text-gray-600">
-              I've built this with the intention of getting my work done. The
-              builtin timer for every taks helps me getting my work done in a
-              timely manner.
+              I&#39;ve built this with the intention of getting my work done.
+              The builtin timer for every task helps me getting my work done in
+              a timely manner.
             </Text>
           </Box>
         </Flex>

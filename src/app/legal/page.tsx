@@ -8,24 +8,31 @@ export default function LegalPage() {
           Legal Notice
         </Heading>
         <Text size="3" className="mb-4">
-          ..
+          DueDo.app
         </Text>
 
         <Heading size="5" className="mt-6 mb-2 text-neutral-200">
           Owner
         </Heading>
-        <Text size="3">..</Text>
+        <Text size="3">Nick Friedrich</Text>
 
         <Heading size="5" className="mt-6 mb-2 text-neutral-200">
           Address
         </Heading>
 
-        <Text size="3">..</Text>
+        <Text size="3">Butterbauernstieg, 22339 Hamburg, Germany</Text>
 
         <Heading size="5" className="mt-6 mb-2 text-neutral-200">
           Contact
         </Heading>
-        <Text size="3">E-Mail: ..</Text>
+        <Text size="3">E-Mail: info@duedo.app</Text>
+
+        <Box className="mt-8">
+          <Text size="3" className="text-neutral-200">
+            Verantwortliche/r im Sinne von § 18 Abs. 2 MStV: Nick Friedrich,
+            Butterbauernstieg, 22339 Hamburg
+          </Text>
+        </Box>
       </Box>
     </Flex>
   );

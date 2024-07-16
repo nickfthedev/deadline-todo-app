@@ -3,7 +3,6 @@
 import {
   AlertDialog,
   Badge,
-  Box,
   Button,
   Card,
   DropdownMenu,
@@ -25,7 +24,7 @@ interface Tag {
 interface TimerCardProps {
   id: string;
   title: string;
-  description: any;
+  description: string | null;
   date: Date;
   doneMode?: boolean;
   updatedAt?: Date;
@@ -59,52 +58,84 @@ export function TimerCard({
   const handleCloseDeleteDialog = () => setIsDeleteDialogOpen(false);
 
   const mutateDeleteTimer = api.timer.deleteTimer.useMutation({
-    onSuccess: () => {
-      utils.timer.getAllTimersByUserID.invalidate();
+    onSuccess: async () => {
+      await utils.timer.getAllTimersByUserID.invalidate();
       showToast("Timer deleted successfully");
+    },
+    onError: (error) => {
+      console.error("Error deleting timer:", error);
+      showToast("Failed to delete timer");
     },
   });
 
   const mutateMarkAsDone = api.timer.markAsDone.useMutation({
-    onSuccess: () => {
-      utils.timer.getAllTimersByUserID.invalidate();
+    onSuccess: async () => {
+      await utils.timer.getAllTimersByUserID.invalidate();
       showToast("Timer marked as done");
+    },
+    onError: (error) => {
+      console.error("Error marking timer as done:", error);
+      showToast("Failed to mark timer as done");
     },
   });
 
   const mutateMarkAsUndone = api.timer.markAsUndone.useMutation({
-    onSuccess: () => {
-      utils.timer.getAllTimersByUserID.invalidate();
+    onSuccess: async () => {
+      await utils.timer.getAllTimersByUserID.invalidate();
       showToast("Timer marked as undone");
+    },
+    onError: (error) => {
+      console.error("Error marking timer as undone:", error);
+      showToast("Failed to mark timer as undone");
     },
   });
 
   const handleDeleteTimer = () => {
-    mutateDeleteTimer.mutate({ id });
+    mutateDeleteTimer.mutate(
+      { id },
+      {
+        onError: (error) => {
+          console.error("Error deleting timer:", error);
+          showToast("Failed to delete timer");
+        },
+      }
+    );
   };
 
   const handleMarkAsDone = () => {
-    mutateMarkAsDone.mutate({ id });
+    mutateMarkAsDone.mutate(
+      { id },
+      {
+        onError: (error) => {
+          console.error("Error marking timer as done:", error);
+          showToast("Failed to mark timer as done");
+        },
+      }
+    );
   };
 
   const handleMarkAsUndone = () => {
-    mutateMarkAsUndone.mutate({ id });
+    mutateMarkAsUndone.mutate(
+      { id },
+      {
+        onError: (error) => {
+          console.error("Error marking timer as undone:", error);
+          showToast("Failed to mark timer as undone");
+        },
+      }
+    );
   };
 
-  if (!doneMode) {
-    useEffect(() => {
-      setIsClient(true);
+  useEffect(() => {
+    setIsClient(true);
+    if (!doneMode) {
       const interval = setInterval(() => {
         setCurrentTime(new Date());
       }, 1000);
 
       return () => clearInterval(interval);
-    }, []);
-  } else {
-    useEffect(() => {
-      setIsClient(true);
-    }, []);
-  }
+    }
+  }, [doneMode]);
 
   if (!isClient) {
     return (
@@ -128,7 +159,6 @@ export function TimerCard({
   const delta = date.getTime() - currentTime.getTime();
   const absDelta = Math.abs(delta);
   let isNegative = delta < 0;
-  let isPositive = delta > 0;
 
   let years = Math.floor(absDelta / (1000 * 60 * 60 * 24 * 365));
   let weeks = Math.floor(
@@ -218,9 +248,11 @@ export function TimerCard({
           </Link>
         </Heading>
         <Text as="p" className="text-sm">
-          {description?.length > 50
+          {typeof description === "string" && description.length > 50
             ? `${description.slice(0, 50)}...`
-            : description?.split("\n")[0]?.slice(0, 50) ?? description ?? ""}
+            : typeof description === "string"
+            ? description.split("\n")[0]?.slice(0, 50) ?? description
+            : ""}
         </Text>
         <Text
           size={"7"}

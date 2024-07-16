@@ -1,6 +1,6 @@
 "use client";
 
-import { Tags } from "@prisma/client";
+import type { Tags } from "@prisma/client";
 import {
   Dialog,
   Button,
@@ -9,7 +9,7 @@ import {
   TextField,
   Callout,
 } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { api } from "~/trpc/react";
 
 export function EditTagDialog({

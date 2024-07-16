@@ -45,7 +45,7 @@ export function TimerList() {
   );
 
   const [view, setView] = useState(
-    () => localStorage.getItem("view") || "card"
+    () => localStorage.getItem("view") ?? "card"
   );
 
   useEffect(() => {

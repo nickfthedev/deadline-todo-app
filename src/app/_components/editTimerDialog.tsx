@@ -17,7 +17,7 @@ import { api } from "~/trpc/react";
 interface Timer {
   id: string;
   title: string;
-  description: any;
+  description: string | null;
   date: Date;
 }
 
@@ -40,10 +40,10 @@ export function EditTimerDialog({
   const utils = api.useUtils();
 
   //Handle Tag List
-  const { data: tagList, isLoading: tagsLoading } =
-    api.tags.getAllTagsByUserID.useQuery(undefined, {
-      enabled: isOpen,
-    });
+  // const { data: tagList, isLoading: tagsLoading } =
+  const { data: tagList } = api.tags.getAllTagsByUserID.useQuery(undefined, {
+    enabled: isOpen,
+  });
 
   const [title, setTitle] = useState(timer.title);
   const [description, setDescription] = useState(timer.description);
@@ -76,7 +76,7 @@ export function EditTimerDialog({
     editTimerMutation.mutate({
       id: timer.id,
       title,
-      description,
+      description: description ?? "",
       date: new Date(date + "T" + time),
       tagId: checkedTags,
     });
@@ -149,7 +149,7 @@ export function EditTimerDialog({
               <TextArea
                 ref={textareaRef}
                 placeholder="Enter the timer description"
-                value={description}
+                value={description ?? ""}
                 onChange={(e) => {
                   setDescription(e.target.value);
                   adjustTextareaHeight();

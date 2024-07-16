@@ -1,11 +1,4 @@
-import {
-  Box,
-  Flex,
-  Heading,
-  Button,
-  Avatar,
-  DropdownMenu,
-} from "@radix-ui/themes";
+import { Box, Flex, Button, Avatar, DropdownMenu } from "@radix-ui/themes";
 import Link from "next/link";
 import { CreateTimerDialog } from "./createTimerDialog";
 import { getServerAuthSession } from "~/server/auth";
@@ -37,8 +30,8 @@ export async function Header() {
               <DropdownMenu.Trigger>
                 <Button variant="ghost">
                   <Avatar
-                    src={session?.user?.image || undefined}
-                    fallback={session?.user?.name?.[0] || "U"}
+                    src={session?.user?.image ?? undefined}
+                    fallback={session?.user?.name?.[0] ?? "U"}
                   />
                 </Button>
               </DropdownMenu.Trigger>

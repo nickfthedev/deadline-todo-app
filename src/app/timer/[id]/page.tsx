@@ -16,7 +16,7 @@ import {
 } from "@radix-ui/themes";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   FiMoreHorizontal,
   FiArrowLeft,
@@ -29,17 +29,17 @@ import { EditTimerDialog } from "~/app/_components/editTimerDialog";
 import { ToastComponent } from "~/app/_components/toast";
 import { api } from "~/trpc/react";
 
-interface Timer {
-  id: string;
-  title: string;
-  description: string;
-  date: Date;
-}
+// interface Timer {
+//   id: string;
+//   title: string;
+//   description: string;
+//   date: Date;
+// }
 
-interface Tag {
-  id: string;
-  name: string;
-}
+// interface Tag {
+//   id: string;
+//   name: string;
+// }
 
 export default function TimerDetails() {
   // Data fetching
@@ -73,40 +73,40 @@ export default function TimerDetails() {
   const handleCloseDeleteDialog = () => setIsDeleteDialogOpen(false);
 
   const mutateDeleteTimer = api.timer.deleteTimer.useMutation({
-    onSuccess: () => {
-      utils.timer.getAllTimersByUserID.invalidate();
-      utils.timer.getTimerByTimerID.invalidate();
+    onSuccess: async () => {
+      await utils.timer.getAllTimersByUserID.invalidate();
+      await utils.timer.getTimerByTimerID.invalidate();
       showToast("Timer deleted successfully");
       router.push("/timer");
     },
   });
 
   const mutateMarkAsDone = api.timer.markAsDone.useMutation({
-    onSuccess: () => {
-      utils.timer.getAllTimersByUserID.invalidate();
-      utils.timer.getTimerByTimerID.invalidate();
+    onSuccess: async () => {
+      await utils.timer.getAllTimersByUserID.invalidate();
+      await utils.timer.getTimerByTimerID.invalidate();
       showToast("Timer marked as done");
     },
   });
 
   const mutateMarkAsUndone = api.timer.markAsUndone.useMutation({
-    onSuccess: () => {
-      utils.timer.getAllTimersByUserID.invalidate();
-      utils.timer.getTimerByTimerID.invalidate();
+    onSuccess: async () => {
+      await utils.timer.getAllTimersByUserID.invalidate();
+      await utils.timer.getTimerByTimerID.invalidate();
       showToast("Timer marked as undone");
     },
   });
 
   const handleDeleteTimer = () => {
-    mutateDeleteTimer.mutate({ id: timer?.id || "" });
+    mutateDeleteTimer.mutate({ id: timer?.id ?? "" });
   };
 
   const handleMarkAsDone = () => {
-    mutateMarkAsDone.mutate({ id: timer?.id || "" });
+    mutateMarkAsDone.mutate({ id: timer?.id ?? "" });
   };
 
   const handleMarkAsUndone = () => {
-    mutateMarkAsUndone.mutate({ id: timer?.id || "" });
+    mutateMarkAsUndone.mutate({ id: timer?.id ?? "" });
   };
 
   // Form Control
@@ -120,27 +120,26 @@ export default function TimerDetails() {
       showToast("There was an error editing the timer");
     },
   });
-  const [title, setTitle] = useState(timer?.title || "");
-  const [description, setDescription] = useState(timer?.description || "");
+  const [title, setTitle] = useState(timer?.title ?? "");
+  const [description, setDescription] = useState(timer?.description ?? "");
   const [date, setDate] = useState("");
   const [time, setTime] = useState(
     timer?.date.toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
-    }) || ""
+    }) ?? ""
   );
   //Handle Tag List
   const [tagsOpen, setTagsOpen] = useState(false);
-  const { data: tagList, isLoading: tagsLoading } =
-    api.tags.getAllTagsByUserID.useQuery(undefined, {
-      enabled: tagsOpen,
-    });
+  const { data: tagList } = api.tags.getAllTagsByUserID.useQuery(undefined, {
+    enabled: tagsOpen,
+  });
   const [checkedTags, setCheckedTags] = useState<string[]>(
-    timer?.tags.map((tag) => tag.id) || []
+    timer?.tags.map((tag) => tag.id) ?? []
   );
   const handleSave = () => {
     editTimerMutation.mutate({
-      id: timer?.id || "",
+      id: timer?.id ?? "",
       title,
       description: description.replace(/"/g, ""),
       date: new Date(date + "T" + time),
@@ -149,8 +148,8 @@ export default function TimerDetails() {
   };
 
   useEffect(() => {
-    setTitle(timer?.title || "");
-    setDescription(timer?.description || "");
+    setTitle(timer?.title ?? "");
+    setDescription(timer?.description ?? "");
     // Format the date correctly
     if (timer?.date) {
       const formattedDate = timer.date.toISOString().split("T")[0] ?? "";
@@ -160,25 +159,21 @@ export default function TimerDetails() {
       timer?.date.toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
-      }) || ""
+      }) ?? ""
     );
-    setCheckedTags(timer?.tags.map((tag) => tag.id) || []);
+    setCheckedTags(timer?.tags.map((tag) => tag.id) ?? []);
   }, [timer]);
 
-  if (!timer?.done) {
-    useEffect(() => {
-      setIsClient(true);
+  useEffect(() => {
+    setIsClient(true);
+    if (!timer?.done) {
       const interval = setInterval(() => {
         setCurrentTime(new Date());
       }, 1000);
 
       return () => clearInterval(interval);
-    }, []);
-  } else {
-    useEffect(() => {
-      setIsClient(true);
-    }, []);
-  }
+    }
+  }, [timer?.done]);
 
   // Auto grow textarea
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -207,7 +202,6 @@ export default function TimerDetails() {
   const delta = timer.date.getTime() - currentTime.getTime();
   const absDelta = Math.abs(delta);
   let isNegative = delta < 0;
-  let isPositive = delta > 0;
 
   let years = Math.floor(absDelta / (1000 * 60 * 60 * 24 * 365));
   let weeks = Math.floor(
@@ -240,7 +234,9 @@ export default function TimerDetails() {
     minutes = Math.floor((updatedAbsDelta % (1000 * 60 * 60)) / (1000 * 60));
     seconds = Math.floor((updatedAbsDelta % (1000 * 60)) / 1000);
   }
-
+  if (isClient) {
+    console.log("isClient", isClient);
+  }
   return (
     <Flex direction={"column"} gap={"4"} mt={"6"} mx={"6"}>
       <ToastComponent
@@ -298,7 +294,7 @@ export default function TimerDetails() {
         <Flex gap={"1"} direction={"row"}>
           <DropdownMenu.Root>
             <DropdownMenu.Trigger>
-              <Button variant="ghost">
+              <Button variant="ghost" onClick={() => setTagsOpen(true)}>
                 {tagList
                   ?.filter((tag) => checkedTags.includes(tag.id))
                   .map((tag) => (

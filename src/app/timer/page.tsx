@@ -2,7 +2,6 @@
 
 import { getServerAuthSession } from "~/server/auth";
 import { Box, Flex } from "@radix-ui/themes";
-import { CreateTimerDialog } from "~/app/_components/createTimerDialog";
 import { TimerList } from "~/app/_components/TimerList";
 import { redirect } from "next/navigation";
 
