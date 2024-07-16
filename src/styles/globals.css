@@ -32,9 +32,9 @@ a {
 
     --color-neutral: #141414;
 
-    --color-primary: #c52233;
-    --color-secondary: #a51c30;
-    --color-accent: #a7333f;
+    --color-primary: #005ce6;
+    --color-secondary: #0099ff;
+    --color-accent: #7e49e0;
 
     --color-warning: #f4c152;
     --color-error: #fb6f84;
@@ -54,82 +54,13 @@ a {
 
     --color-neutral: #efefef;
 
-    --color-primary: #c52233;
-    --color-secondary: #a51c30;
-    --color-accent: #a7333f;
+    --color-primary: #005ce6;
+    --color-secondary: #0099ff;
+    --color-accent: #7e49e0;
 
     --color-warning: #f4c152;
     --color-error: #fb6f84;
     --color-success: #2bd4bd;
     --color-info: #0ca6e9;
   }
-}
-
-.yoopta-action-menu-list button span {
-  line-height: 120%;
-}
-
-#highlight-color-portal,
-#toolbar-portal,
-#action-menu-list-portal,
-.yoopta-mark-code,
-.yoopta-extended-block-actions {
-  color: #000;
-}
-
-[data-floating-ui-portal] {
-  color: #000;
-}
-
-#slack .yoopta-editor .yoopta-block-actions-plus {
-  display: none;
-}
-
-#slack .yoopta-editor .yoopta-mark-code {
-  color: #e8912d;
-  background-color: #2b2d30;
-  font-variant-ligatures: none;
-  white-space: pre;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  word-break: normal;
-  tab-size: 4;
-  border-radius: 3px;
-  padding: 2px 3px 1px;
-  font-size: 12px;
-  line-height: 1.50001;
-  font-family: Monaco, Menlo, Consolas, Courier New, monospace !important;
-  border: 1px solid rgba(232, 232, 232, 0.13);
-}
-
-#slack .yoopta-editor .yoopta-code .yoopta-code-cm-editor .cm-editor {
-  border: 1px solid rgb(53, 55, 59);
-}
-
-#slack .yoopta-editor .yoopta-code .cm-content {
-  padding: 8px;
-  line-height: 1.46668;
-}
-
-table,
-th,
-td {
-  border: 1px solid black;
-}
-
-.yoopta-carousel .yoopta-carousel-options {
-  opacity: 0;
-  transition: opacity 0.15s ease-in-out;
-  top: 0px;
-  right: 0px;
-}
-
-.yoopta-carousel:hover .yoopta-carousel-options {
-  opacity: 1;
-}
-
-.yoopta-main-page-blockquote {
-  color: white;
-  background-color: #1f6feb;
-  border-left-color: #00ca56 !important;
 }

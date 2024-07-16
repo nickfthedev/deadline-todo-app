@@ -53,7 +53,9 @@ const TagLink = ({
 
 export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
   // Data Querys
-  const tags = api.tags.getAllTagsByUserID.useQuery();
+  const tags = api.tags.getAllTagsByUserID.useQuery(undefined, {
+    enabled: loggedIn,
+  });
 
   // Open, Close, Pin Logic
   const [isVisible, setIsVisible] = useState(false);
@@ -217,18 +219,15 @@ export function Sidebar({ loggedIn }: { loggedIn: boolean }) {
             >
               Home
             </Link>
-            <Link
-              className="mr-1 mx-1 p-3 rounded-md hover:bg-link-hover hover:text-white text-sm hover:shadow"
-              href="/about"
-            >
-              About
-            </Link>
-            <Link
-              className="mr-1 mx-1 p-3 rounded-md hover:bg-link-hover hover:text-white text-sm hover:shadow"
-              href="/contact"
-            >
-              Contact
-            </Link>
+            {loggedIn && (
+              <Link
+                className="mr-1 mx-1 p-3 rounded-md hover:bg-link-hover hover:text-white text-sm hover:shadow"
+                href="/timer"
+              >
+                Timer
+              </Link>
+            )}
+
             {loggedIn && (
               <>
                 <SubHeading title="Tags" />

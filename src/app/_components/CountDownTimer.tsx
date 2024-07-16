@@ -34,7 +34,10 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({
   }, [hours, minutes, seconds]);
 
   return (
-    <Text size="9" className="font-bold text-blue-800">
+    <Text
+      size="9"
+      className="font-bold bg-gradient-to-r from-primary via-secondary to-accent text-transparent bg-clip-text"
+    >
       {hours.toString().padStart(2, "0")}H:
       {minutes.toString().padStart(2, "0")}M:
       {seconds.toString().padStart(2, "0")}S
