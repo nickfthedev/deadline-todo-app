@@ -1,3 +1,10 @@
+# Todo Deadline App
+Basically the name says it. It shows todos as countdown timers. And thats what it's all about. Based on T3 Stack with RadixUI, TailwindCSS and Prisma (Postgres).
+Ready to deploy. This is the first version of duedo.app, which will be continued in a new private repository. 
+
+To easily run it just add a database and auth provideer credentials to the env, run the docker file or use yarn to install and run it. 
+
+
 # Create T3 App
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
